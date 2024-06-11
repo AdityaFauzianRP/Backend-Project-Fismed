@@ -1,4 +1,4 @@
-# My Go Project
+# Backend Project Fismed App
 
 ![Go](https://img.shields.io/badge/Go-1.22.4-blue)
 ![Gin](https://img.shields.io/badge/Gin-1.7.7-green)
