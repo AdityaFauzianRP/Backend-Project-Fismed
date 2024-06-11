@@ -6,6 +6,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"log"
 	"time"
 )
 
@@ -45,10 +46,12 @@ func UpdateTokenInDatabase(userID int, newToken string) error {
 	}
 	defer tx.Rollback(ctx)
 
+	log.Println("ID :", userID, "New Token", newToken)
+
 	updateQuery := `
-        UPDATE dev.pengguna
+        UPDATE users
         SET token = $1
-        WHERE id_pengguna = $2
+        WHERE id = $2
     `
 
 	_, err = tx.Exec(ctx, updateQuery, newToken, userID)

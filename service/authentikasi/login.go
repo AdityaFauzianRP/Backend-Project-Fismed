@@ -14,10 +14,10 @@ import (
 
 func Login(c *gin.Context) {
 	type Pengguna struct {
-		ID           int    `json:"id_pengguna"`
-		RolePengguna string `json:"role_pengguna"`
+		ID           int    `json:"id"`
+		Username     string `json:"username"`
+		RolePengguna string `json:"role_name"`
 		RoleID       int    `json:"role_id"`
-		DesaID       int    `json:"desa_id"`
 		Token        string `json:"token"`
 	}
 
@@ -76,19 +76,16 @@ func Login(c *gin.Context) {
 	var idp int
 
 	cek_password := `
-		select password, id_pengguna from dev.pengguna where username = $1
+		select password, id from users u where username = $1
 	`
 	err = tx.QueryRow(ctx, cek_password, input.Username).Scan(&validasi_pass, &idp)
 	if err != nil {
-		log.Println("masuk sini 1")
-		cek_password := `
-			select password, id_pengguna from dev.pengguna where nik = $1
-		`
-		err = tx.QueryRow(ctx, cek_password, input.Username).Scan(&validasi_pass, &idp)
-		if err != nil {
-
-			log.Fatal(err)
-		}
+		log.Println("Data User Not Found")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  false,
+			"message": "Data User Not Found",
+		})
+		return
 	}
 
 	hasher := md5.New()
@@ -107,18 +104,10 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	log.Println("masuk sini 2")
+	log.Println("Login Successfully, Send Data Users For Frontend")
 
 	query_pengguna := `
-	select 
-		a.id_pengguna,
-		b.nama_role as role_pengguna,
-		a.role_id,
-		a.desa_id,
-		COALESCE(a.token, '') AS token
-	from dev.pengguna a, dev.role b
-	where id_pengguna = $1
-	and a.role_id  = b.id_role 
+	select a.id, a.username , a."token" , a.role_id , b."role" from users a, user_category b where a.id = $1 and a.role_id = b.id 
 	`
 	row1, err := tx.Query(ctx, query_pengguna, idp)
 
@@ -139,10 +128,10 @@ func Login(c *gin.Context) {
 		var ambil Pengguna
 		err := row1.Scan(
 			&ambil.ID,
-			&ambil.RolePengguna,
-			&ambil.RoleID,
-			&ambil.DesaID,
+			&ambil.Username,
 			&ambil.Token,
+			&ambil.RoleID,
+			&ambil.RolePengguna,
 		)
 
 		if err != nil {
@@ -161,7 +150,7 @@ func Login(c *gin.Context) {
 		Tampung_pengguna[0].Token, err = service.GenerateToken(Tampung_pengguna[0].ID)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "Failed Generated Token"})
 			err = tx.Commit(ctx)
 			if err != nil {
 				panic(err.Error())

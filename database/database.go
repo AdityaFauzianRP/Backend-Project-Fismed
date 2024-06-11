@@ -1,6 +1,7 @@
 package database
 
 import (
+	"backend_project_fismed/service"
 	"backend_project_fismed/service/authentikasi"
 	"log"
 
@@ -12,7 +13,7 @@ import (
 )
 
 func NewConnect() *pgxpool.Pool {
-	databaseUrl := "postgres://postgres:admin123@localhost:5432/postgres"
+	databaseUrl := "postgres://postgres:admin123@localhost:5432/fismed"
 	//databaseUrl := "postgres://postgres:boyang123@morodb.cmwu6s1vldt3.ap-southeast-1.rds.amazonaws.com:5432/morowali"
 
 	config, err := pgxpool.ParseConfig(databaseUrl)
@@ -32,6 +33,7 @@ func NewConnect() *pgxpool.Pool {
 	log.Println("[--->] Success Created DB Connection...!")
 
 	authentikasi.InitiateDB(db)
+	service.InitiateDB(db)
 
 	return db
 }
