@@ -11,7 +11,7 @@ Pastikan Anda telah menginstal Go di sistem Anda. Anda dapat mengunduhnya dari [
 
 ## Cara Menjalankan Proyek
 
-### Langkah 1: Mengatur Modul
+### Langkah - Langkah: Mengatur Modul
 Jalankan perintah berikut untuk memastikan semua dependensi proyek terunduh dan file `go.mod` serta `go.sum` diperbarui.
 
 ```bash or any Terminal
