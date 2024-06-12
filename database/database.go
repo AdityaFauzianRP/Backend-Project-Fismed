@@ -3,6 +3,7 @@ package database
 import (
 	"backend_project_fismed/service"
 	"backend_project_fismed/service/authentikasi"
+	"backend_project_fismed/service/customerProfilling"
 	"log"
 
 	"os"
@@ -22,7 +23,7 @@ func NewConnect() *pgxpool.Pool {
 		os.Exit(1)
 	}
 
-	config.MaxConns = 10
+	config.MaxConns = 2
 
 	db, err := pgxpool.ConnectConfig(context.Background(), config)
 	if err != nil {
@@ -34,6 +35,7 @@ func NewConnect() *pgxpool.Pool {
 
 	authentikasi.InitiateDB(db)
 	service.InitiateDB(db)
+	customerProfilling.InitiateDB(db)
 
 	return db
 }
