@@ -24,7 +24,7 @@ func GetTaxCode(c *gin.Context) {
 	rows, err := tx.Query(ctx, query)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
 		return
 	}
 	defer rows.Close()
@@ -34,7 +34,7 @@ func GetTaxCode(c *gin.Context) {
 		var tc TaxCode
 		if err := rows.Scan(&tc.Id, &tc.TaxCode); err != nil {
 			tx.Rollback(ctx)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan tax code"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan tax code", "status": false})
 			return
 		}
 		taxCodes = append(taxCodes, tc)
@@ -42,14 +42,14 @@ func GetTaxCode(c *gin.Context) {
 
 	if err := rows.Err(); err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error iterating over tax code rows"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error iterating over tax code rows", "status": false})
 		return
 	}
 
 	if len(taxCodes) > 0 {
-		c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "tax_codes": taxCodes})
+		c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "tax_codes": taxCodes, "status": true})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "tax_codes": "No tax codes available"})
+		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "tax_codes": "No tax codes available", "status": true})
 	}
 
 }
