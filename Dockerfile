@@ -1,10 +1,10 @@
 FROM golang:1.22.4-alpine3.20 AS builder
 WORKDIR /app
 
-RUN apk add --no-cache make git
+# RUN apk add --no-cache make git
 
 
-RUN git version
+# RUN git version
 
 
 COPY . .
@@ -44,13 +44,14 @@ USER ${USER}
 RUN mkdir log
 
 COPY --from=builder /app/backend_project_fismed /${HOME}/${APP_NAME}
+COPY --from=builder /app/docker-entrypoint.sh /${HOME}/
+
 
 RUN  pwd
 RUN  ls -al
 
 USER root
-COPY docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x /${HOME}/docker-entrypoint.sh
 RUN chown -R -v ${UID}.${GID} ${HOME}
 RUN chmod 777 -R .
 RUN ls -al ${HOME}
@@ -58,4 +59,4 @@ USER ${USER}
 EXPOSE 8080
 WORKDIR ${HOME}
 
-CMD ["./docker-entrypoint.sh","./be-fismed"]
+CMD ["./home/be-go/docker-entrypoint.sh","./be-fismed"]

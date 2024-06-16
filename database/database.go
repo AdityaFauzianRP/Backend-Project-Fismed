@@ -15,7 +15,8 @@ import (
 
 func NewConnect() *pgxpool.Pool {
 	databaseUrl := "postgres://postgres:admin123@localhost:5432/fismed"
-	//databaseUrl := "postgres://postgres:boyang123@morodb.cmwu6s1vldt3.ap-southeast-1.rds.amazonaws.com:5432/morowali"
+	//buat docker
+	//databaseUrl := "postgres://fismed-user:boyang123@fismed-db:5432/fismed"
 
 	config, err := pgxpool.ParseConfig(databaseUrl)
 	if err != nil {
