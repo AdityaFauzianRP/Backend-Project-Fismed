@@ -4,6 +4,8 @@ import (
 	"backend_project_fismed/service"
 	"backend_project_fismed/service/authentikasi"
 	"backend_project_fismed/service/customerProfilling"
+	"backend_project_fismed/service/proformaInvoice"
+	"backend_project_fismed/service/stockBarang"
 	"log"
 
 	"os"
@@ -37,6 +39,8 @@ func NewConnect() *pgxpool.Pool {
 	authentikasi.InitiateDB(db)
 	service.InitiateDB(db)
 	customerProfilling.InitiateDB(db)
+	proformaInvoice.InitiateDB(db)
+	stockBarang.InitiateDB(db)
 
 	return db
 }

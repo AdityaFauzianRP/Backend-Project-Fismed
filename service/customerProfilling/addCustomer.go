@@ -73,12 +73,12 @@ func Add(c *gin.Context) {
 
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 		return
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
 		return
 	}
 
