@@ -23,7 +23,8 @@ func Routes(router *gin.Engine) {
 	//	Pro forma Invoice API Start
 
 	router.POST("/api/proforma-invoice/get-all-list", proformaInvoice.GetAllList)
-	router.POST("/api/proforma-invoice/addPI", proformaInvoice.AddPI)
+	router.POST("/api/proforma-invoice/inquiry", proformaInvoice.Inquiry)
+	router.POST("/api/proforma-invoice/posting", proformaInvoice.Posting)
 	router.POST("/api/proforma-invoice/detailPI", proformaInvoice.DetailPI)
 	router.POST("/api/proforma-invoice/editPI", proformaInvoice.EditPI)
 	router.POST("/api/proforma-invoice/divisi-list", proformaInvoice.DivisiList)
