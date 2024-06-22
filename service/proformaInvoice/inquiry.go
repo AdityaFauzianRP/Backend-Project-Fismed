@@ -72,7 +72,6 @@ func Inquiry(c *gin.Context) {
 
 			response.Item[i].SubTotalItem = subtotalperitemstring
 			response.Item[i].SubTotalItemRP = "Rp. " + service.FormatRupiah(subtotalperitemstring)
-
 		}
 	}
 
@@ -88,10 +87,23 @@ func Inquiry(c *gin.Context) {
 	response.RumahSakit = input.RumahSakit
 	response.IdDivisi = input.IdDivisi
 	response.Alamat = input.Alamat
+	response.IdRumahSakit = input.IdRumahSakit
 	response.Tanggal = time.Now().Format("2006-01-02")
 	response.NomorPO = "PO/" + service.GenerateTigaNomor() + "/" + service.GenerateNomorPO()
 	response.NomorInvoice = "PI/" + service.GenerateTigaNomor() + "/" + service.GenerateNomorInvoice()
 	response.NomorSI = "SI/" + service.GenerateTigaNomor() + "/" + service.GenerateNomorInvoice()
+
+	if input.IdDivisi == "1" {
+		response.NamaPasien = ""
+		response.NamaDokter = ""
+		response.RM = ""
+
+	} else if input.IdDivisi == "2" {
+		response.NamaPasien = input.NamaPasien
+		response.NamaDokter = "DR. " + input.NamaDokter
+		response.RM = input.RM
+		response.TanggalTindakan = input.TanggalTindakan
+	}
 
 	ExpireDate, err := strconv.Atoi(input.JatuhTempo)
 	if err != nil {

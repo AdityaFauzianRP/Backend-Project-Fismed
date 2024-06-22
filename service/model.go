@@ -3,12 +3,12 @@ package service
 import "time"
 
 type StockBarang struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Total     string    `json:"total"`
-	Price     string    `json:"price"`
-	CreatedAt time.Time `json:"created_at"`
-	CreatedBy string    `json:"created_by"`
+	ID        int       `json:"id,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	Total     string    `json:"total,omitempty"`
+	Price     string    `json:"price,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedBy string    `json:"created_by,omitempty"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	UpdatedBy string    `json:"updated_by,omitempty"`
 }
@@ -36,11 +36,16 @@ type PerformanceInvoice struct {
 }
 
 type ReqInquiryPI struct {
-	IdDivisi   string    `json:"id_divisi"`
-	RumahSakit string    `json:"rumah_sakit"`
-	Alamat     string    `json:"alamat"`
-	JatuhTempo string    `json:"jatuh_tempo"`
-	Item       []ReqItem `json:"item"`
+	IdDivisi        string    `json:"id_divisi"`
+	RumahSakit      string    `json:"rumah_sakit"`
+	Alamat          string    `json:"alamat"`
+	JatuhTempo      string    `json:"jatuh_tempo"`
+	NamaDokter      string    `json:"nama_dokter"`
+	NamaPasien      string    `json:"nama_pasien"`
+	IdRumahSakit    string    `json:"id_rumah_sakit"`
+	TanggalTindakan string    `json:"tanggal_tindakan"`
+	RM              string    `json:"rm"`
+	Item            []ReqItem `json:"item"`
 }
 
 type ReqItem struct {
@@ -52,21 +57,26 @@ type ReqItem struct {
 }
 
 type ResInquiryPI struct {
-	IdDivisi     string    `json:"id_divisi"`
-	RumahSakit   string    `json:"rumah_sakit"`
-	Alamat       string    `json:"alamat"`
-	NomorInvoice string    `json:"nomor_invoice"`
-	NomorPO      string    `json:"nomor_po"`
-	NomorSI      string    `json:"nomor_si"`
-	Tanggal      string    `json:"tanggal"`
-	JatuhTempo   string    `json:"jatuh_tempo"`
-	SubTotal     string    `json:"sub_total"`
-	PajakPPN     string    `json:"pajak_ppn"`
-	Total        string    `json:"total"`
-	SubTotalRP   string    `json:"RP_sub_total"`
-	PajakPPNRP   string    `json:"RP_pajak_ppn"`
-	TotalRP      string    `json:"RP_total"`
-	Item         []ResItem `json:"item"`
+	IdDivisi        string    `json:"id_divisi"`
+	IdRumahSakit    string    `json:"id_rumah_sakit"`
+	RumahSakit      string    `json:"rumah_sakit"`
+	Alamat          string    `json:"alamat"`
+	NomorInvoice    string    `json:"nomor_invoice"`
+	NomorPO         string    `json:"nomor_po"`
+	NomorSI         string    `json:"nomor_si"`
+	Tanggal         string    `json:"tanggal"`
+	JatuhTempo      string    `json:"jatuh_tempo"`
+	SubTotal        string    `json:"sub_total"`
+	PajakPPN        string    `json:"pajak_ppn"`
+	Total           string    `json:"total"`
+	SubTotalRP      string    `json:"RP_sub_total"`
+	PajakPPNRP      string    `json:"RP_pajak_ppn"`
+	TotalRP         string    `json:"RP_total"`
+	NamaDokter      string    `json:"nama_dokter,omitempty"`
+	NamaPasien      string    `json:"nama_pasien,omitempty"`
+	TanggalTindakan string    `json:"tanggal_tindakan,omitempty"`
+	RM              string    `json:"rm,omitempty"`
+	Item            []ResItem `json:"item"`
 }
 
 type ResItem struct {
@@ -80,26 +90,27 @@ type ResItem struct {
 }
 
 type Customer struct {
-	Name               string `json:"name"`
-	AddressCompany     string `json:"address_company"`
-	NPWPAddress        string `json:"npwp_address"`
-	NPWP               string `json:"npwp"`
-	IpakNumber         string `json:"ipak_number"`
-	FactureAddress     string `json:"facture_address"`
-	CityFacture        string `json:"city_facture"`
-	ZipCodeFacture     string `json:"zip_code_facture"`
-	NumberPhoneFacture string `json:"number_phone_facture"`
-	EmailFacture       string `json:"email_facture"`
-	FaxFacture         string `json:"fax_facture"`
-	PicFacture         string `json:"pic_facture"`
-	ItemAddress        string `json:"item_address"`
-	CityItem           string `json:"city_item"`
-	ZipCodeItem        string `json:"zip_code_item"`
-	NumberPhoneItem    string `json:"number_phone_item"`
-	EmailItem          string `json:"email_item"`
-	FaxItem            string `json:"fax_item"`
-	PicItem            string `json:"pic_item"`
-	ContactPerson      string `json:"contact_person"`
-	TaxCodeID          string `json:"tax_code_id"`
-	Top                string `json:"top"`
+	ID                 int    `json:"id,omitempty"`
+	Name               string `json:"name,omitempty"`
+	AddressCompany     string `json:"address_company,omitempty"`
+	NPWPAddress        string `json:"npwp_address,omitempty"`
+	NPWP               string `json:"npwp,omitempty"`
+	IpakNumber         string `json:"ipak_number,omitempty"`
+	FactureAddress     string `json:"facture_address,omitempty"`
+	CityFacture        string `json:"city_facture,omitempty"`
+	ZipCodeFacture     string `json:"zip_code_facture,omitempty"`
+	NumberPhoneFacture string `json:"number_phone_facture,omitempty"`
+	EmailFacture       string `json:"email_facture,omitempty"`
+	FaxFacture         string `json:"fax_facture,omitempty"`
+	PicFacture         string `json:"pic_facture,omitempty"`
+	ItemAddress        string `json:"item_address,omitempty"`
+	CityItem           string `json:"city_item,omitempty"`
+	ZipCodeItem        string `json:"zip_code_item,omitempty"`
+	NumberPhoneItem    string `json:"number_phone_item,omitempty"`
+	EmailItem          string `json:"email_item,omitempty"`
+	FaxItem            string `json:"fax_item,omitempty"`
+	PicItem            string `json:"pic_item,omitempty"`
+	ContactPerson      string `json:"contact_person,omitempty"`
+	TaxCodeID          string `json:"tax_code_id,omitempty"`
+	Top                string `json:"top,omitempty"`
 }

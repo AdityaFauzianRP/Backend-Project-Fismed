@@ -17,6 +17,7 @@ func Routes(router *gin.Engine) {
 
 	router.POST("/api/customer-profilling/add", customerProfilling.Add)
 	router.POST("/api/customer-profilling/get-tax-code", customerProfilling.GetTaxCode)
+	router.POST("/api/customer-profilling/get-by-search", customerProfilling.GetBySearch)
 
 	//	Customer Profilling API End
 
@@ -28,6 +29,7 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/proforma-invoice/detailPI", proformaInvoice.DetailPI)
 	router.POST("/api/proforma-invoice/editPI", proformaInvoice.EditPI)
 	router.POST("/api/proforma-invoice/divisi-list", proformaInvoice.DivisiList)
+	router.POST("/api/proforma-invoice/rs-list", proformaInvoice.RumahSakitList)
 
 	//	Pro forma Invoice API End
 
