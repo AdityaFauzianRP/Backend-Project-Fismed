@@ -8,16 +8,14 @@ import (
 	"net/http"
 )
 
-func DivisiList(c *gin.Context) {
-	// List Divisi PI
-
+func RumahSakitList(c *gin.Context) {
 	ctx := context.Background()
 	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
 
-	query := "select id, COALESCE(name, 'default_name') AS name from divisi order by id asc;"
+	query := "SELECT id, COALESCE(name, 'default_name') AS name, COALESCE(address_company, 'default_address') AS address_company FROM customer order by id asc ;"
 
 	rows, err := tx.Query(ctx, query)
 	if err != nil {
@@ -33,6 +31,7 @@ func DivisiList(c *gin.Context) {
 		if err := rows.Scan(
 			&res.ID,
 			&res.Name,
+			&res.AddressCompany,
 		); err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})

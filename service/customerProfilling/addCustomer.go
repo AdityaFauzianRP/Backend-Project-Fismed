@@ -1,6 +1,7 @@
 package customerProfilling
 
 import (
+	"backend_project_fismed/service"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -8,32 +9,8 @@ import (
 )
 
 func Add(c *gin.Context) {
-	type Request struct {
-		Name               string `json:"name"`
-		AddressCompany     string `json:"address_company"`
-		NPWPAddress        string `json:"npwp_address"`
-		NPWP               string `json:"npwp"`
-		IpakNumber         string `json:"ipak_number"`
-		FactureAddress     string `json:"facture_address"`
-		CityFacture        string `json:"city_facture"`
-		ZipCodeFacture     string `json:"zip_code_facture"`
-		NumberPhoneFacture string `json:"number_phone_facture"`
-		EmailFacture       string `json:"email_facture"`
-		FaxFacture         string `json:"fax_facture"`
-		PicFacture         string `json:"pic_facture"`
-		ItemAddress        string `json:"item_address"`
-		CityItem           string `json:"city_item"`
-		ZipCodeItem        string `json:"zip_code_item"`
-		NumberPhoneItem    string `json:"number_phone_item"`
-		EmailItem          string `json:"email_item"`
-		FaxItem            string `json:"fax_item"`
-		PicItem            string `json:"pic_item"`
-		ContactPerson      string `json:"contact_person"`
-		TaxCodeID          string `json:"tax_code_id"`
-		Top                string `json:"top"`
-	}
 
-	var input Request
+	var input service.Customer
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
