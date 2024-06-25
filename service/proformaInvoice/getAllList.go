@@ -16,12 +16,12 @@ func GetAllList(c *gin.Context) {
 		panic(err.Error())
 	}
 
-	query := "select  COALESCE(id, 0) AS id, COALESCE(customer_id, 0) AS customer_id, COALESCE(item_name, '') AS item_name, COALESCE(discount, '') AS discount, COALESCE(status, '') AS status, COALESCE(divisi, '') AS divisi, COALESCE(invoice_number, 0) AS invoice_number, COALESCE(po_number, 0) AS po_number,  COALESCE(sub_total, '') AS sub_total, COALESCE(pajak, '') AS pajak, COALESCE(total, '') AS total, TO_CHAR(COALESCE(created_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS created_at, COALESCE(created_by, '') AS created_by, TO_CHAR(COALESCE(update_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS update_at, COALESCE(updated_by, '') AS updated_by from performance_invoice ORDER BY id;"
+	query := "select COALESCE(id, 0) AS id, COALESCE(customer_id, 0) AS customer_id, COALESCE(status, '') AS status, COALESCE(divisi, '') AS divisi, COALESCE(invoice_number, '') AS invoice_number, COALESCE(po_number, '') AS po_number,  COALESCE(sub_total, '') AS sub_total, COALESCE(pajak, '') AS pajak, COALESCE(total, '') AS total, TO_CHAR(COALESCE(created_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS created_at, COALESCE(created_by, '') AS created_by, TO_CHAR(COALESCE(update_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS update_at, COALESCE(updated_by, '') AS updated_by from performance_invoice ORDER BY id;"
 
 	rows, err := tx.Query(ctx, query)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
 	defer rows.Close()
@@ -32,8 +32,6 @@ func GetAllList(c *gin.Context) {
 		if err := rows.Scan(
 			&res.ID,
 			&res.CustomerID,
-			&res.ItemName,
-			&res.Discount,
 			&res.Status,
 			&res.Divisi,
 			&res.InvoiceNumber,

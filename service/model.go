@@ -14,18 +14,17 @@ type StockBarang struct {
 }
 
 type RequestID struct {
-	ID string `json:"id"`
+	ID     string `json:"id"`
+	Divisi string `json:"divisi"`
 }
 
 type PerformanceInvoice struct {
 	ID            int    `json:"id"`
 	CustomerID    int    `json:"customer_id"`
-	ItemName      string `json:"item_name"`
-	Discount      string `json:"discount"`
 	Status        string `json:"status"`
 	Divisi        string `json:"divisi"`
-	InvoiceNumber int    `json:"invoice_number"`
-	PONumber      int    `json:"po_number"`
+	InvoiceNumber string `json:"invoice_number"`
+	PONumber      string `json:"po_number"`
 	SubTotal      string `json:"sub_total"`
 	Pajak         string `json:"pajak"`
 	Total         string `json:"total"`
@@ -113,4 +112,37 @@ type Customer struct {
 	ContactPerson      string `json:"contact_person,omitempty"`
 	TaxCodeID          string `json:"tax_code_id,omitempty"`
 	Top                string `json:"top,omitempty"`
+}
+
+type PerformanceInvoiceDetail struct {
+	ID              int             `json:"id,omitempty"`
+	CustomerID      int             `json:"customer_id,omitempty"`
+	Status          string          `json:"status,omitempty"`
+	Divisi          string          `json:"divisi,omitempty"`
+	InvoiceNumber   string          `json:"invoice_number,omitempty"`
+	PONumber        string          `json:"po_number,omitempty"`
+	DueDate         string          `json:"due_date,omitempty"`
+	DoctorName      string          `json:"doctor_name,omitempty"`
+	PatientName     string          `json:"patient_name,omitempty"`
+	TanggalTindakan string          `json:"tanggal_tindakan,omitempty"`
+	RM              string          `json:"rm,omitempty"`
+	NumberSI        string          `json:"number_si,omitempty"`
+	SubTotal        string          `json:"sub_total,omitempty"`
+	SubTotalRP      string          `json:"RP_sub_total"`
+	Pajak           string          `json:"pajak,omitempty"`
+	PajakPPNRP      string          `json:"RP_pajak_ppn"`
+	Total           string          `json:"total,omitempty"`
+	TotalRP         string          `json:"RP_total"`
+	ItemDetailPI    []ResItemDetail `json:"item_detail_pi,omitempty"`
+}
+
+type ResItemDetail struct {
+	Id             int    `json:"id,omitempty"`
+	Kat            string `json:"kat,omitempty"`
+	NamaBarang     string `json:"nama_barang,omitempty"`
+	Quantity       string `json:"quantity,omitempty"`
+	HargaSatuan    string `json:"harga_satuan,omitempty"`
+	Discount       string `json:"discount,omitempty"`
+	SubTotalItem   string `json:"sub_total_item,omitempty"`
+	RPSubTotalItem string `json:"rp_sub_total_item,omitempty"`
 }
