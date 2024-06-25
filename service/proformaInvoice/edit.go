@@ -99,3 +99,7 @@ func EditPI(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Inquiry Performa Invoice Success !", "data": response, "status": true})
 }
+
+func PostingEdit_PI(c *gin.Context) {
+	log.Println("Performa Invoice Posting")
+}

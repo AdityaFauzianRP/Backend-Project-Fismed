@@ -37,16 +37,16 @@ func Add(c *gin.Context) {
 		facture_address, city_facture, zip_code_facture, number_phone_facture, email_facture, fax_facture, pic_facture,
 		item_address, city_item, zip_code_item, number_phone_item, email_item, fax_item, pic_item,
 		contact_person, tax_code_id, top,
-		created_at, created_by, updated_at, updated_by
+		created_at, created_by, updated_at, updated_by, handphone
 	) VALUES (
-		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW(), 'admin', NOW(), 'admin'
+		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW(), 'admin', NOW(), 'admin', $23
 	)`
 
 	_, err = tx.Exec(ctx, query,
 		input.Name, input.AddressCompany, input.NPWPAddress, input.NPWP, input.IpakNumber,
 		input.FactureAddress, input.CityFacture, input.ZipCodeFacture, input.NumberPhoneFacture, input.EmailFacture, input.FaxFacture, input.PicFacture,
 		input.ItemAddress, input.CityItem, input.ZipCodeItem, input.NumberPhoneItem, input.EmailItem, input.FaxItem, input.PicItem,
-		input.ContactPerson, input.TaxCodeID, input.Top)
+		input.ContactPerson, input.TaxCodeID, input.Top, input.Handphone)
 
 	if err != nil {
 		tx.Rollback(ctx)
