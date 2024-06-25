@@ -21,12 +21,10 @@ type RequestID struct {
 type PerformanceInvoice struct {
 	ID            int    `json:"id"`
 	CustomerID    int    `json:"customer_id"`
-	ItemName      string `json:"item_name"`
-	Discount      string `json:"discount"`
 	Status        string `json:"status"`
 	Divisi        string `json:"divisi"`
-	InvoiceNumber int    `json:"invoice_number"`
-	PONumber      int    `json:"po_number"`
+	InvoiceNumber string `json:"invoice_number"`
+	PONumber      string `json:"po_number"`
 	SubTotal      string `json:"sub_total"`
 	Pajak         string `json:"pajak"`
 	Total         string `json:"total"`
@@ -119,7 +117,6 @@ type Customer struct {
 type PerformanceInvoiceDetail struct {
 	ID              int             `json:"id,omitempty"`
 	CustomerID      int             `json:"customer_id,omitempty"`
-	SubTotal        string          `json:"sub_total,omitempty"`
 	Status          string          `json:"status,omitempty"`
 	Divisi          string          `json:"divisi,omitempty"`
 	InvoiceNumber   string          `json:"invoice_number,omitempty"`
@@ -127,11 +124,15 @@ type PerformanceInvoiceDetail struct {
 	DueDate         string          `json:"due_date,omitempty"`
 	DoctorName      string          `json:"doctor_name,omitempty"`
 	PatientName     string          `json:"patient_name,omitempty"`
-	Pajak           string          `json:"pajak,omitempty"`
-	Total           string          `json:"total,omitempty"`
 	TanggalTindakan string          `json:"tanggal_tindakan,omitempty"`
 	RM              string          `json:"rm,omitempty"`
 	NumberSI        string          `json:"number_si,omitempty"`
+	SubTotal        string          `json:"sub_total,omitempty"`
+	SubTotalRP      string          `json:"RP_sub_total"`
+	Pajak           string          `json:"pajak,omitempty"`
+	PajakPPNRP      string          `json:"RP_pajak_ppn"`
+	Total           string          `json:"total,omitempty"`
+	TotalRP         string          `json:"RP_total"`
 	ItemDetailPI    []ResItemDetail `json:"item_detail_pi,omitempty"`
 }
 
