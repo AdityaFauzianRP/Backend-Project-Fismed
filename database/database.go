@@ -16,10 +16,10 @@ import (
 )
 
 func NewConnect() *pgxpool.Pool {
-	//	DB LOCALHOST
+	//	DB LOCALHOST ADIT
 	//databaseUrl := "postgres://postgres:admin123@localhost:5432/fismed"
 
-	//  DB FISMED
+	//  DB FISMED DEV
 	databaseUrl := "postgres://fismed-user:fismed-db-12345@62.146.233.39:5445/fismed"
 
 	//  BUAT DOCKER

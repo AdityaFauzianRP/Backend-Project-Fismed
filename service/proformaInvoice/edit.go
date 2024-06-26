@@ -2,10 +2,13 @@ package proformaInvoice
 
 import (
 	"backend_project_fismed/service"
+	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func EditPI(c *gin.Context) {
@@ -82,6 +85,7 @@ func EditPI(c *gin.Context) {
 
 			response.ItemDetailPI[i].SubTotalItem = subtotalperitemstring
 			response.ItemDetailPI[i].RPSubTotalItem = "Rp. " + service.FormatRupiah(subtotalperitemstring)
+			response.ItemDetailPI[i].Id = item.Id
 		}
 	}
 
@@ -102,4 +106,176 @@ func EditPI(c *gin.Context) {
 
 func PostingEdit_PI(c *gin.Context) {
 	log.Println("Performa Invoice Posting")
+
+	var input service.PerformanceInvoiceDetail
+	//var response service.PerformanceInvoiceDetail
+
+	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
+
+		if err := c.Bind(&input); err != nil {
+			return
+		}
+
+	} else {
+
+		if err := c.BindJSON(&input); err != nil {
+			return
+		}
+
+	}
+
+	log.Println("Input Data :", input)
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if input.Divisi == "Ortopedi" {
+		query := `
+			UPDATE performance_invoice
+			SET
+				customer_id = $1,
+				sub_total = $2,
+				status = $3,
+				divisi = $4,
+				invoice_number = $5,
+				po_number = $6,
+				due_date = $7,
+				pajak = $8,
+				total = $9,
+				number_si = $10,
+				update_at = now(),
+				updated_by = 'sales'
+			WHERE id = $11;
+			`
+
+		_, err = tx.Exec(context.Background(), query,
+			input.CustomerID,
+			input.SubTotalRP,
+			input.Status,
+			input.Divisi,
+			input.InvoiceNumber,
+			input.PONumber,
+			input.DueDate,
+			input.PajakPPNRP,
+			input.TotalRP,
+			input.NumberSI,
+			input.ID,
+		)
+
+	} else if input.Divisi == "Radiologi" {
+		query := `
+			UPDATE performance_invoice
+			SET
+				customer_id = $1,
+				sub_total = $2,
+				status = $3,
+				divisi = $4,
+				invoice_number = $5,
+				po_number = $6,
+				due_date = $7,
+				doctor_name = $8,
+				patient_name = $9,
+				pajak = $10,
+				total = $11,
+				tanggal_tindakan = $12,
+				rm = $13,
+				number_si = $14,
+				update_at = now(),
+				updated_by = 'sales'
+			WHERE id = $15;
+			`
+
+		_, err = tx.Exec(context.Background(), query,
+			input.CustomerID,
+			input.SubTotalRP,
+			input.Status,
+			input.Divisi,
+			input.InvoiceNumber,
+			input.PONumber,
+			input.DueDate,
+			input.DoctorName,
+			input.PatientName,
+			input.PajakPPNRP,
+			input.TotalRP,
+			input.TanggalTindakan,
+			input.RM,
+			input.NumberSI,
+			input.ID,
+		)
+
+	}
+
+	if err != nil {
+		tx.Rollback(ctx)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	if len(input.ItemDetailPI) > 0 {
+		for _, detail := range input.ItemDetailPI {
+			if detail.Id == 0 {
+				QueryItem := `
+					insert into order_items (
+						pi_id, "name", quantity, price, discount, 
+						sub_total, kat, 
+						created_at, created_by, update_at, updated_by
+						) 
+					VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'sales', NOW(), 'sales')
+				`
+
+				_, err = tx.Exec(ctx, QueryItem,
+					input.ID, detail.NamaBarang, detail.Quantity, detail.HargaSatuan,
+					detail.Discount, detail.RPSubTotalItem, detail.Kat)
+
+				if err != nil {
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+					return
+				}
+			} else {
+				query := `
+				UPDATE order_items
+				SET
+					name = $1,
+					quantity = $2,
+					price = $3,
+					discount = $4,
+					sub_total = $5,
+					kat = $6,
+					update_at = $7,
+					updated_by = $8
+				WHERE id = $9;
+				`
+
+				_, err = tx.Exec(context.Background(), query,
+					detail.NamaBarang,
+					detail.Quantity,
+					detail.HargaSatuan,
+					detail.Discount,
+					detail.RPSubTotalItem,
+					detail.Kat,
+					time.Now(),
+					"sales",
+					input.ID,
+				)
+
+				if err != nil {
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+					return
+				}
+			}
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data Update Successfully", "status": true})
+
 }
