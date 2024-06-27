@@ -134,6 +134,7 @@ type PerformanceInvoiceDetail struct {
 	PajakPPNRP      string          `json:"RP_pajak_ppn"`
 	Total           string          `json:"total,omitempty"`
 	TotalRP         string          `json:"RP_total"`
+	Reason          string          `json:"reason,omitempty"`
 	ItemDetailPI    []ResItemDetail `json:"item_detail_pi,omitempty"`
 }
 
