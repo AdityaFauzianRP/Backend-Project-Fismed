@@ -279,3 +279,82 @@ func PostingEdit_PI(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Data Update Successfully", "status": true})
 
 }
+
+func EditAdmin(c *gin.Context) {
+	var input service.PerformanceInvoiceDetail
+
+	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
+
+		if err := c.Bind(&input); err != nil {
+			return
+		}
+
+	} else {
+
+		if err := c.BindJSON(&input); err != nil {
+			return
+		}
+
+	}
+
+	log.Println("Input Data :", input)
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+
+	log.Println("tx.DBConnection :", tx)
+
+	if input.Status == "Diterima" {
+		log.Println("PI diterima admin, update status ke :", input.Status)
+		query := `
+			UPDATE performance_invoice
+			SET
+				status = $1,
+				update_at = now(),
+				updated_by = 'admin'
+			WHERE id = $2;
+			`
+
+		_, err = tx.Exec(context.Background(), query,
+			input.Status,
+			input.ID,
+		)
+
+	} else if input.Status == "Ditolak" {
+		log.Println("PI ditolak admin, update status ke :", input.Status)
+		log.Println("PI ditolak admin, tambah alasan ke :", input.Reason)
+
+		query := `
+			UPDATE performance_invoice
+			SET
+				status = $1,
+				reason = $2,
+				update_at = now(),
+				updated_by = 'admin'
+			WHERE id = $3;
+			`
+
+		_, err = tx.Exec(context.Background(), query,
+			input.Status,
+			input.Reason,
+			input.ID,
+		)
+
+	}
+
+	if err != nil {
+		tx.Rollback(ctx)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data Update Successfully", "status": true})
+}
