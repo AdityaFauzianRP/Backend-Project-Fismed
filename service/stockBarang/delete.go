@@ -1,7 +1,7 @@
 package stockBarang
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/model"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -10,7 +10,7 @@ import (
 
 func Delete(c *gin.Context) {
 	// Delete Data Stock Barang
-	var input service.RequestID
+	var input model.RequestID
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 

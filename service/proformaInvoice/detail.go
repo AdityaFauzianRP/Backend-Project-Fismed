@@ -1,7 +1,7 @@
 package proformaInvoice
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/model"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -11,7 +11,7 @@ import (
 func DetailPI(c *gin.Context) {
 	// Detail Data PI
 
-	var input service.RequestID
+	var input model.RequestID
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
@@ -67,7 +67,7 @@ func DetailPI(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var invoice service.PerformanceInvoiceDetail
+	var invoice model.PerformanceInvoiceDetail
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -115,10 +115,10 @@ func DetailPI(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var TampungItem []service.ResItemDetail
+	var TampungItem []model.ResItemDetail
 
 	for rows.Next() {
-		var ambil service.ResItemDetail
+		var ambil model.ResItemDetail
 
 		err := rows.Scan(
 			&ambil.Id,
@@ -143,7 +143,7 @@ func DetailPI(c *gin.Context) {
 	if invoice.ID != 0 {
 		c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "data": invoice, "status": true})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []service.StockBarang{}, "status": true})
+		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []model.StockBarang{}, "status": true})
 	}
 
 }

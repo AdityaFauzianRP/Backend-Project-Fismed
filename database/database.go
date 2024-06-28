@@ -1,12 +1,12 @@
 package database
 
 import (
-	"backend_project_fismed/service"
 	"backend_project_fismed/service/authentikasi"
 	"backend_project_fismed/service/customerProfilling"
 	"backend_project_fismed/service/preOrder"
 	"backend_project_fismed/service/proformaInvoice"
 	"backend_project_fismed/service/stockBarang"
+	"backend_project_fismed/utility"
 	"log"
 
 	"os"
@@ -43,7 +43,7 @@ func NewConnect() *pgxpool.Pool {
 	log.Println("[--->] Success Created DB Connection...!")
 
 	authentikasi.InitiateDB(db)
-	service.InitiateDB(db)
+	utility.InitiateDB(db)
 	customerProfilling.InitiateDB(db)
 	proformaInvoice.InitiateDB(db)
 	stockBarang.InitiateDB(db)
