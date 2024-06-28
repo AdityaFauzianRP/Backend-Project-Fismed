@@ -323,6 +323,10 @@ func EditAdmin(c *gin.Context) {
 			input.ID,
 		)
 
+		//  Ketika di terima Data Insert ke Table SO
+
+		//  Ketika berhasil insert ke table SO maka masuk ke table Pemasukan
+
 	} else if input.Status == "Ditolak" {
 		log.Println("PI ditolak admin, update status ke :", input.Status)
 		log.Println("PI ditolak admin, tambah alasan ke :", input.Reason)
