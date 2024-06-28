@@ -1,7 +1,7 @@
 package authentikasi
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/utility"
 	"context"
 	"crypto/md5"
 	"encoding/hex"
@@ -147,7 +147,7 @@ func Login(c *gin.Context) {
 	}
 
 	if len(Tampung_pengguna) > 0 {
-		Tampung_pengguna[0].Token, err = service.GenerateToken(Tampung_pengguna[0].ID)
+		Tampung_pengguna[0].Token, err = utility.GenerateToken(Tampung_pengguna[0].ID)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "Failed Generated Token"})
@@ -158,7 +158,7 @@ func Login(c *gin.Context) {
 			return
 		}
 
-		err = service.UpdateTokenInDatabase(Tampung_pengguna[0].ID, Tampung_pengguna[0].Token)
+		err = utility.UpdateTokenInDatabase(Tampung_pengguna[0].ID, Tampung_pengguna[0].Token)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": err.Error()})

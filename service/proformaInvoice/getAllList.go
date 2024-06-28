@@ -1,7 +1,7 @@
 package proformaInvoice
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/model"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -26,9 +26,9 @@ func GetAllList(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var Responses []service.PerformanceInvoice
+	var Responses []model.PerformanceInvoice
 	for rows.Next() {
-		var res service.PerformanceInvoice
+		var res model.PerformanceInvoice
 		if err := rows.Scan(
 			&res.ID,
 			&res.CustomerID,
@@ -60,6 +60,6 @@ func GetAllList(c *gin.Context) {
 	if len(Responses) > 0 {
 		c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "data": Responses, "status": true})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []service.PerformanceInvoice{}, "status": true})
+		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []model.PerformanceInvoice{}, "status": true})
 	}
 }

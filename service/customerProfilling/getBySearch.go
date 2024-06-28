@@ -1,7 +1,7 @@
 package customerProfilling
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/model"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -13,7 +13,7 @@ import (
 
 func GetBySearch(c *gin.Context) {
 
-	var input service.Customer
+	var input model.Customer
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
@@ -75,10 +75,10 @@ func GetBySearch(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var response []service.Customer
+	var response []model.Customer
 
 	for rows.Next() {
-		var tc service.Customer
+		var tc model.Customer
 		if err := rows.Scan(
 			&tc.ID,
 			&tc.Name,
@@ -154,10 +154,10 @@ func GetBySearch(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var responseRiwayat []service.StockBarang
+	var responseRiwayat []model.StockBarang
 
 	for rows.Next() {
-		var tc service.StockBarang
+		var tc model.StockBarang
 		if err := rows.Scan(
 			&tc.Name,
 			&tc.Total,
@@ -188,10 +188,10 @@ func GetBySearch(c *gin.Context) {
 		fmt.Printf("Item: %s, Total Quantity: %d\n", itemName, quantity)
 	}
 
-	var itemTotals []service.StockBarang
+	var itemTotals []model.StockBarang
 
 	for itemName, quantity := range itemQuantities {
-		itemTotals = append(itemTotals, service.StockBarang{Name: itemName, Total: strconv.Itoa(quantity)})
+		itemTotals = append(itemTotals, model.StockBarang{Name: itemName, Total: strconv.Itoa(quantity)})
 	}
 
 	if len(response) > 0 {
@@ -203,7 +203,7 @@ func GetBySearch(c *gin.Context) {
 			"status":        true,
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "Data": []service.Customer{}, "status": true})
+		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "Data": []model.Customer{}, "status": true})
 	}
 
 }

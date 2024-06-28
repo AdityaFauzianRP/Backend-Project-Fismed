@@ -1,7 +1,7 @@
 package proformaInvoice
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/model"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -12,7 +12,7 @@ import (
 func Posting(c *gin.Context) {
 	// Ini untuk posting
 
-	var input service.ResInquiryPI
+	var input model.ResInquiryPI
 	var newID int
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {

@@ -1,7 +1,8 @@
 package proformaInvoice
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/model"
+	"backend_project_fismed/utility"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -12,8 +13,8 @@ import (
 func Inquiry(c *gin.Context) {
 	// Inquiry API
 
-	var input service.ReqInquiryPI
-	var response service.ResInquiryPI
+	var input model.ReqInquiryPI
+	var response model.ResInquiryPI
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
@@ -32,7 +33,7 @@ func Inquiry(c *gin.Context) {
 	log.Println("Data Input :", input)
 
 	// Proses Subtotal
-	response.Item = make([]service.ResItem, len(input.Item))
+	response.Item = make([]model.ResItem, len(input.Item))
 
 	var Subtotal int = 0
 
@@ -71,7 +72,7 @@ func Inquiry(c *gin.Context) {
 			subtotalperitemstring := strconv.Itoa(subtotalperitem)
 
 			response.Item[i].SubTotalItem = subtotalperitemstring
-			response.Item[i].SubTotalItemRP = "Rp. " + service.FormatRupiah(subtotalperitemstring)
+			response.Item[i].SubTotalItemRP = "Rp. " + utility.FormatRupiah(subtotalperitemstring)
 		}
 	}
 
@@ -81,17 +82,17 @@ func Inquiry(c *gin.Context) {
 	response.SubTotal = strconv.Itoa(Subtotal)
 	response.PajakPPN = strconv.Itoa(pajak)
 	response.Total = strconv.Itoa(total)
-	response.TotalRP = "Rp. " + service.FormatRupiah(response.Total)
-	response.PajakPPNRP = "Rp. " + service.FormatRupiah(response.PajakPPN)
-	response.SubTotalRP = "Rp. " + service.FormatRupiah(response.SubTotal)
+	response.TotalRP = "Rp. " + utility.FormatRupiah(response.Total)
+	response.PajakPPNRP = "Rp. " + utility.FormatRupiah(response.PajakPPN)
+	response.SubTotalRP = "Rp. " + utility.FormatRupiah(response.SubTotal)
 	response.RumahSakit = input.RumahSakit
 	response.IdDivisi = input.IdDivisi
 	response.Alamat = input.Alamat
 	response.IdRumahSakit = input.IdRumahSakit
 	response.Tanggal = time.Now().Format("2006-01-02")
-	response.NomorPO = "PO/" + service.GenerateTigaNomor() + "/" + service.GenerateNomorPO()
-	response.NomorInvoice = "PI/" + service.GenerateTigaNomor() + "/" + service.GenerateNomorInvoice()
-	response.NomorSI = "SI/" + service.GenerateTigaNomor() + "/" + service.GenerateNomorInvoice()
+	response.NomorPO = "PO/" + utility.GenerateTigaNomor() + "/" + utility.GenerateNomorPO()
+	response.NomorInvoice = "PI/" + utility.GenerateTigaNomor() + "/" + utility.GenerateNomorInvoice()
+	response.NomorSI = "SI/" + utility.GenerateTigaNomor() + "/" + utility.GenerateNomorInvoice()
 
 	if input.IdDivisi == "1" {
 		response.NamaPasien = ""

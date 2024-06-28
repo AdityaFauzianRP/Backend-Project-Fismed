@@ -1,7 +1,7 @@
 package stockBarang
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/model"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -11,7 +11,7 @@ import (
 func Detail(c *gin.Context) {
 	// Detail Barang
 
-	var input service.RequestID
+	var input model.RequestID
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
@@ -43,9 +43,9 @@ func Detail(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var Responses []service.StockBarang
+	var Responses []model.StockBarang
 	for rows.Next() {
-		var res service.StockBarang
+		var res model.StockBarang
 		if err := rows.Scan(
 			&res.ID,
 			&res.Name,
@@ -72,6 +72,6 @@ func Detail(c *gin.Context) {
 	if len(Responses) > 0 {
 		c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "data": Responses, "status": true})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []service.StockBarang{}, "status": true})
+		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []model.StockBarang{}, "status": true})
 	}
 }

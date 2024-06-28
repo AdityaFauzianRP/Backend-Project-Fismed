@@ -1,7 +1,8 @@
 package proformaInvoice
 
 import (
-	"backend_project_fismed/service"
+	"backend_project_fismed/model"
+	"backend_project_fismed/utility"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -13,8 +14,8 @@ import (
 
 func EditPI(c *gin.Context) {
 	//  Edit Data PI
-	var input service.PerformanceInvoiceDetail
-	var response service.PerformanceInvoiceDetail
+	var input model.PerformanceInvoiceDetail
+	var response model.PerformanceInvoiceDetail
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
@@ -46,7 +47,7 @@ func EditPI(c *gin.Context) {
 	response.NumberSI = input.NumberSI
 
 	var Subtotal int = 0
-	response.ItemDetailPI = make([]service.ResItemDetail, len(input.ItemDetailPI))
+	response.ItemDetailPI = make([]model.ResItemDetail, len(input.ItemDetailPI))
 
 	if len(input.ItemDetailPI) > 0 {
 
@@ -84,7 +85,7 @@ func EditPI(c *gin.Context) {
 			subtotalperitemstring := strconv.Itoa(subtotalperitem)
 
 			response.ItemDetailPI[i].SubTotalItem = subtotalperitemstring
-			response.ItemDetailPI[i].RPSubTotalItem = "Rp. " + service.FormatRupiah(subtotalperitemstring)
+			response.ItemDetailPI[i].RPSubTotalItem = "Rp. " + utility.FormatRupiah(subtotalperitemstring)
 			response.ItemDetailPI[i].Id = item.Id
 		}
 	}
@@ -97,9 +98,9 @@ func EditPI(c *gin.Context) {
 	response.SubTotal = strconv.Itoa(Subtotal)
 	response.Pajak = strconv.Itoa(pajak)
 	response.Total = strconv.Itoa(total)
-	response.TotalRP = "Rp. " + service.FormatRupiah(response.Total)
-	response.PajakPPNRP = "Rp. " + service.FormatRupiah(response.Pajak)
-	response.SubTotalRP = "Rp. " + service.FormatRupiah(response.SubTotal)
+	response.TotalRP = "Rp. " + utility.FormatRupiah(response.Total)
+	response.PajakPPNRP = "Rp. " + utility.FormatRupiah(response.Pajak)
+	response.SubTotalRP = "Rp. " + utility.FormatRupiah(response.SubTotal)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Inquiry Performa Invoice Success !", "data": response, "status": true})
 }
@@ -107,7 +108,7 @@ func EditPI(c *gin.Context) {
 func PostingEdit_PI(c *gin.Context) {
 	log.Println("Performa Invoice Posting")
 
-	var input service.PerformanceInvoiceDetail
+	var input model.PerformanceInvoiceDetail
 	//var response service.PerformanceInvoiceDetail
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
@@ -281,7 +282,7 @@ func PostingEdit_PI(c *gin.Context) {
 }
 
 func EditAdmin(c *gin.Context) {
-	var input service.PerformanceInvoiceDetail
+	var input model.PerformanceInvoiceDetail
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
