@@ -1,10 +1,12 @@
 package authentikasi
 
 import (
+	"context"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 	"log"
-	"time"
+	"net/http"
 )
 
 func TokenValidate(c *gin.Context) {
@@ -28,11 +30,23 @@ func TokenValidate(c *gin.Context) {
 
 	}
 
-	// ctx := context.Background()
-	// tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+	QueryGetByToke := `
+		select u.id, u.username from users u where u.token = $1;
+	`
+
+	var ID int
+	var USERNAME string
+
+	err = tx.QueryRow(ctx, QueryGetByToke, input.Token).Scan(&ID, &USERNAME)
+	if err != nil {
+		log.Println("Error parsing token:", err)
+		return
+	}
 
 	tokenString := input.Token
 
@@ -54,21 +68,37 @@ func TokenValidate(c *gin.Context) {
 	if expirationTime < float64(jwt.TimeFunc().Unix()) {
 		log.Println("Token telah kedaluwarsa")
 
-		// Hitung berapa lama waktu token telah kedaluwarsa
-		currentTime := time.Now().Unix()
-		expiredTime := int64(expirationTime)
+		query := `
+			UPDATE users 
+			SET "token" = $2
+			WHERE id = $1;
+			`
 
-		timePassed := currentTime - expiredTime
-		if timePassed > 600 { // Lebih dari 10 menit (600 detik)
-			log.Println("Waktu lebih dari 10 menit setelah kadaluwarsa. Refresh token.")
-			// Lakukan proses refresh token di sini
-
-		} else {
-			log.Println("Belum lebih dari 10 menit setelah kadaluwarsa. Tidak perlu refresh token.")
+		_, err = tx.Exec(context.Background(), query, ID, "Empty")
+		if err != nil {
+			tx.Rollback(ctx)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+			return
 		}
+
+		if err := tx.Commit(ctx); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Token Is Not Active !",
+			"status":  false,
+		})
+
 		return
 	}
 
 	// Token masih dalam waktu yang valid
 	log.Println("Token masih valid")
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Token Is Active !",
+		"status":  true,
+	})
 }

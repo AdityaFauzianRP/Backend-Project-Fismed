@@ -5,6 +5,7 @@ import (
 	"backend_project_fismed/service/customerProfilling"
 	"backend_project_fismed/service/preOrder"
 	"backend_project_fismed/service/proformaInvoice"
+	"backend_project_fismed/service/salesOrder"
 	"backend_project_fismed/service/stockBarang"
 	"github.com/gin-gonic/gin"
 )
@@ -51,4 +52,10 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/pre-order/list", preOrder.ListPO)
 
 	//  Pre Order API End
+
+	//	Sales Order API Start
+
+	router.POST("/api/sales_order/list", salesOrder.ListDaftar_PO)
+
+	//  Sales Order API End
 }

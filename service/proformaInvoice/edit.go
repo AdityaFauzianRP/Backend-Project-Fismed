@@ -109,6 +109,7 @@ func PostingEdit_PI(c *gin.Context) {
 	log.Println("Performa Invoice Posting")
 
 	var input model.PerformanceInvoiceDetail
+
 	//var response service.PerformanceInvoiceDetail
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
@@ -272,6 +273,8 @@ func PostingEdit_PI(c *gin.Context) {
 		}
 	}
 
+	//  Ketika Berhasik Pengaruhi jumlah Stok
+
 	if err := tx.Commit(ctx); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
 		return
@@ -324,9 +327,7 @@ func EditAdmin(c *gin.Context) {
 			input.ID,
 		)
 
-		//  Ketika di terima Data Insert ke Table SO
-
-		//  Ketika berhasil insert ke table SO maka masuk ke table Pemasukan
+		//  Berhasil Masuk Ke Keuangan Mereka
 
 	} else if input.Status == "Ditolak" {
 		log.Println("PI ditolak admin, update status ke :", input.Status)
@@ -347,6 +348,8 @@ func EditAdmin(c *gin.Context) {
 			input.Reason,
 			input.ID,
 		)
+
+		//  Berhasil Masuk Ke Keuangan Mereka
 
 	}
 

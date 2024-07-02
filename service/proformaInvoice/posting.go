@@ -134,6 +134,8 @@ func Posting(c *gin.Context) {
 		}
 	}
 
+	//  Ketika Berhasik Pengaruhi jumlah Stok
+
 	if err := tx.Commit(ctx); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
 		return

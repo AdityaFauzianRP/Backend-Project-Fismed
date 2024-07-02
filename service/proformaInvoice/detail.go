@@ -49,7 +49,8 @@ func DetailPI(c *gin.Context) {
 			COALESCE(total, '') AS total,
 			COALESCE(tanggal_tindakan, '') AS tanggal_tindakan,
 			COALESCE(rm, '') AS rm,
-			COALESCE(number_si, '') AS number_si
+			COALESCE(number_si, '') AS number_si,
+			COALESCE(reason, '') AS reason
 		FROM 
 			performance_invoice
 		where id = $1
@@ -86,6 +87,7 @@ func DetailPI(c *gin.Context) {
 			&invoice.TanggalTindakan,
 			&invoice.RM,
 			&invoice.NumberSI,
+			&invoice.Reason,
 		)
 
 		if err != nil {

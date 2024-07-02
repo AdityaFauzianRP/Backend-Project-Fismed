@@ -22,7 +22,7 @@ func List(c *gin.Context) {
 	rows, err := tx.Query(ctx, query)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
 	defer rows.Close()
