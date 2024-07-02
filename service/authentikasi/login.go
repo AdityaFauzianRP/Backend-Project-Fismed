@@ -47,6 +47,7 @@ func Login(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	if input.Username == "" {
 		c.JSON(400, gin.H{
@@ -78,14 +79,23 @@ func Login(c *gin.Context) {
 	cek_password := `
 		select password, id from users u where username = $1
 	`
-	err = tx.QueryRow(ctx, cek_password, input.Username).Scan(&validasi_pass, &idp)
+	row, err := tx.Query(ctx, cek_password, input.Username)
+
 	if err != nil {
-		log.Println("Data User Not Found")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  false,
-			"message": "Data User Not Found",
-		})
 		return
+	}
+	defer row.Close()
+
+	for row.Next() {
+		err := row.Scan(&validasi_pass, &idp)
+		if err != nil {
+			log.Println("Data User Tidak Ditemukan")
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  false,
+				"message": "Data User Tidak Ditemukan",
+			})
+			return
+		}
 	}
 
 	hasher := md5.New()
@@ -147,7 +157,7 @@ func Login(c *gin.Context) {
 	}
 
 	if len(Tampung_pengguna) > 0 {
-		Tampung_pengguna[0].Token, err = utility.GenerateToken(Tampung_pengguna[0].ID)
+		Tampung_pengguna[0].Token, err = utility.GenerateToken(Tampung_pengguna[0].ID, input.Username)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "Failed Generated Token"})

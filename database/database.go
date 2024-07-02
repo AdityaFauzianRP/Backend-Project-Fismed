@@ -5,10 +5,10 @@ import (
 	"backend_project_fismed/service/customerProfilling"
 	"backend_project_fismed/service/preOrder"
 	"backend_project_fismed/service/proformaInvoice"
+	"backend_project_fismed/service/salesOrder"
 	"backend_project_fismed/service/stockBarang"
 	"backend_project_fismed/utility"
 	"log"
-
 	"os"
 
 	"context"
@@ -32,7 +32,7 @@ func NewConnect() *pgxpool.Pool {
 		os.Exit(1)
 	}
 
-	config.MaxConns = 2
+	config.MaxConns = 100
 
 	db, err := pgxpool.ConnectConfig(context.Background(), config)
 	if err != nil {
@@ -48,6 +48,7 @@ func NewConnect() *pgxpool.Pool {
 	proformaInvoice.InitiateDB(db)
 	stockBarang.InitiateDB(db)
 	preOrder.InitiateDB(db)
+	salesOrder.InitiateDB(db)
 
 	return db
 }

@@ -21,10 +21,10 @@ func InitiateDB(db *pgxpool.Pool) {
 
 }
 
-func GenerateToken(userID int) (string, error) {
-	privateKey := []byte("secretKey")
+func GenerateToken(userID int, username string) (string, error) {
+	privateKey := []byte(username)
 
-	expirationTime := time.Now().Add(1 * time.Hour)
+	expirationTime := time.Now().Add(8 * time.Hour)
 
 	claims := &jwt.StandardClaims{
 		ExpiresAt: expirationTime.Unix(),
@@ -128,4 +128,14 @@ func FormatRupiah(amountStr string) string {
 	}
 
 	return result.String()
+}
+
+func RupiahToNumber(rupiah string) string {
+	// Hilangkan "Rp." dan titik-titik
+	rupiah = strings.Replace(rupiah, "Rp. ", "", -1)
+	rupiah = strings.Replace(rupiah, ".", "", -1)
+
+	// Konversi string ke float64
+	fmt.Printf("Angka biasa: %.0f\n", rupiah)
+	return rupiah
 }
