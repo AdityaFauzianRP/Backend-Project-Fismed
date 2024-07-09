@@ -81,6 +81,24 @@ func Posting(c *gin.Context) {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 					return
 				}
+
+				//  Pengaruhi Jumlah Stock Barang
+
+				QueryStock := `
+					UPDATE stock_items
+					SET total = total::integer - $1
+					WHERE name = $2;
+				`
+
+				_, err = tx.Exec(ctx, QueryStock,
+					item.Quantity, item.NamaBarang)
+
+				if err != nil {
+					log.Println("[--->]", "Error Query Update Stock Barang :", err)
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+					return
+				}
 			}
 		}
 	} else if input.IdDivisi == "2" {
@@ -130,11 +148,63 @@ func Posting(c *gin.Context) {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 					return
 				}
+
+				QueryStock := `
+					UPDATE stock_items
+					SET total = total::integer - $1
+					WHERE name = $2;
+				`
+
+				_, err = tx.Exec(ctx, QueryStock,
+					item.Quantity, item.NamaBarang)
+
+				if err != nil {
+					log.Println("[--->]", "Error Query Update Stock Barang :", err)
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+					return
+				}
 			}
 		}
 	}
 
-	//  Ketika Berhasik Pengaruhi jumlah Stok
+	//  Ketika Berhasil Insert Ke Teble Piutang
+
+	QueryPiutang := `
+					insert into piutang (
+						nama, nominal, amount, tanggal
+						) 
+					VALUES ($1, $2, $3, NOW())
+				`
+
+	_, err = tx.Exec(ctx, QueryPiutang,
+		input.RumahSakit, input.Total, input.TotalRP)
+
+	if err != nil {
+		log.Println("[--->]", "Error Query Input Piutang :", err)
+		tx.Rollback(ctx)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	//  Ketika Berhasil Insert Ke Table Pemasukan
+
+	QueryPemasukan := `
+					insert into pemasukan (
+						nama, nominal, amount, tanggal
+						) 
+					VALUES ($1, $2, $3, NOW())
+				`
+
+	_, err = tx.Exec(ctx, QueryPemasukan,
+		input.RumahSakit, input.Total, input.TotalRP)
+
+	if err != nil {
+		log.Println("[--->]", "Error Query Input Pemasukan :", err)
+		tx.Rollback(ctx)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
 
 	if err := tx.Commit(ctx); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})

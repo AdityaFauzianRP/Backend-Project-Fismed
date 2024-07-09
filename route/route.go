@@ -3,6 +3,8 @@ package route
 import (
 	"backend_project_fismed/service/authentikasi"
 	"backend_project_fismed/service/customerProfilling"
+	"backend_project_fismed/service/pemasukan"
+	"backend_project_fismed/service/piutang"
 	"backend_project_fismed/service/preOrder"
 	"backend_project_fismed/service/proformaInvoice"
 	"backend_project_fismed/service/salesOrder"
@@ -58,4 +60,16 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/sales_order/list", salesOrder.ListDaftar_PO)
 
 	//  Sales Order API End
+
+	//	Pemasukan API Start
+
+	router.POST("/api/pemasukan/list", pemasukan.List)
+
+	//  Pemasukan API End
+
+	//	Piutang API Start
+
+	router.POST("/api/piutang/list", piutang.List)
+
+	//  Piutang API End
 }
