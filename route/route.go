@@ -16,6 +16,7 @@ func Routes(router *gin.Engine) {
 
 	router.POST("/api/login", authentikasi.Login)
 	router.POST("/api/token-validate", authentikasi.TokenValidate)
+	//router.POST("/api/image", authentikasi.Image)
 
 	//	Customer Profilling API Start
 
@@ -51,7 +52,8 @@ func Routes(router *gin.Engine) {
 
 	//	Pre Order API Start
 
-	router.POST("/api/pre-order/list", preOrder.ListPO)
+	router.POST("/api/purchase-order/list", preOrder.ListPO)
+	router.POST("/api/purchase-order/inquiry", preOrder.Inquiry)
 
 	//  Pre Order API End
 
