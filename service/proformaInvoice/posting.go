@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
+	"time"
 )
 
 func Posting(c *gin.Context) {
@@ -45,13 +46,13 @@ func Posting(c *gin.Context) {
 			   status, divisi, invoice_number, po_number, due_date, 
 			   created_at, created_by, update_at, updated_by, total, pajak, number_si
 			) VALUES (
-			$1, $2, 'Diproses', 'Ortopedi', $3, $4, $5, NOW(), 'sales', NOW(), 'sales', $6, $7, $8 
+			$1, $2, 'Diproses', 'Ortopedi', $3, $4, $5, $6, 'sales', $7, 'sales', $8, $9, $10 
 			)
 			RETURNING id
 		`
 
 		err = tx.QueryRow(ctx, QeuryInputPI, input.IdRumahSakit, input.SubTotalRP, input.NomorInvoice,
-			input.NomorPO, input.JatuhTempo, input.TotalRP, input.PajakPPNRP, input.NomorSI).Scan(&newID)
+			input.NomorPO, input.JatuhTempo, time.Now(), time.Now(), input.TotalRP, input.PajakPPNRP, input.NomorSI).Scan(&newID)
 
 		if err != nil {
 			log.Println("[--->]", "Error Query Input PI :", err)
