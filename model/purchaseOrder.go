@@ -10,7 +10,7 @@ type PurchaseOrder struct {
 	PreparedJabatan string      `json:"prepared_jabatan,omitempty"`
 	ApprovedBy      string      `json:"approved_by,omitempty"`
 	ApprovedJabatan string      `json:"approved_jabatan,omitempty"`
-	Divisi          string      `json:"divisi,omitempty"`
+	Status          string      `json:"status,omitempty"`
 	SubTotal        string      `json:"sub_total,omitempty"`
 	Pajak           string      `json:"pajak,omitempty"`
 	Total           string      `json:"total,omitempty"`
@@ -19,6 +19,8 @@ type PurchaseOrder struct {
 	UpdatedAt       string      `json:"updated_at,omitempty"`
 	UpdatedBy       string      `json:"updated_by,omitempty"`
 	Item            []ItemBuyer `json:"item,omitempty"`
+
+	Reason string `json:"reason,omitempty"`
 }
 
 // ItemBuyer represents the item_buyer table

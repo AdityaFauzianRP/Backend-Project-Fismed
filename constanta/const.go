@@ -21,4 +21,8 @@ const (
 	ErrScan6 string = "Gagal Eksekusi Scan 6"
 
 	ErrCommit string = "Gagal Commit Ke Database"
+
+	Diterima string = "DITERIMA"
+	Ditolak  string = "DIPROSES"
+	Diproses string = "DITOLAK"
 )

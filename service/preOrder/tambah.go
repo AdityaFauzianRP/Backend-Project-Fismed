@@ -50,6 +50,7 @@ func Posting(c *gin.Context) {
 			prepared_jabatan, 
 			approved_by, 
 			approved_jabatan, 
+			status,
 			created_at, 
 			created_by, 
 			updated_at, 
@@ -57,11 +58,11 @@ func Posting(c *gin.Context) {
 			sub_total, 
 			pajak, 
 			total
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)RETURNING id`
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)RETURNING id`
 
 	// Menjalankan query insert
 	err = tx.QueryRow(context.Background(), query, input.NamaSuplier, input.NomorPO, input.Tanggal,
-		input.CatatanPO, input.PreparedBy, input.PreparedJabatan, input.ApprovedBy, input.ApprovedJabatan,
+		input.CatatanPO, input.PreparedBy, input.PreparedJabatan, input.ApprovedBy, input.ApprovedJabatan, "DIPROSES",
 		time.Now(), "ADMIN", time.Now(), "ADMIN", input.SubTotal, input.Pajak, input.Total).Scan(&id)
 	if err != nil {
 		tx.Rollback(ctx)
@@ -132,7 +133,7 @@ func Inquiry(c *gin.Context) {
 			res.Item[i].Name = item.Name
 			res.Item[i].Quantity = item.Quantity
 			res.Item[i].Price = "Rp. " + utility.FormatRupiah(item.Price)
-			res.Item[i].Discount = item.Discount
+			res.Item[i].Discount = item.Discount + "%"
 
 			QuantitiInt, err := strconv.Atoi(item.Quantity)
 			if err != nil {
