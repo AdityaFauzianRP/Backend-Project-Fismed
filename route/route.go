@@ -57,6 +57,8 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/purchase-order/inquiry", preOrder.Inquiry)
 	router.POST("/api/purchase-order/posting", preOrder.Posting)
 	router.POST("/api/purchase-order/edit/finance", preOrder.Edit_Finance)
+	router.POST("/api/purchase-order/edit/inquiry", preOrder.Edit_Admin)
+	router.POST("/api/purchase-order/edit/posting", preOrder.Edit_Finance)
 
 	//  Pre Order API End
 
