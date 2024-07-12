@@ -2,6 +2,7 @@ package proformaInvoice
 
 import (
 	"backend_project_fismed/model"
+	"backend_project_fismed/utility"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -141,6 +142,10 @@ func DetailPI(c *gin.Context) {
 	}
 
 	invoice.ItemDetailPI = TampungItem
+
+	if input.Export == "YES" {
+		utility.ExportPI(c, invoice)
+	}
 
 	if invoice.ID != 0 {
 		c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "data": invoice, "status": true})

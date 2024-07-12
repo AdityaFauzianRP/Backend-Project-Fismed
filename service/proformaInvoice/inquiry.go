@@ -108,7 +108,7 @@ func Inquiry(c *gin.Context) {
 
 	ExpireDate, err := strconv.Atoi(input.JatuhTempo)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid Discount format"})
+		c.JSON(400, gin.H{"error": "Invalid Jatuh tempo Format format"})
 		return
 	}
 

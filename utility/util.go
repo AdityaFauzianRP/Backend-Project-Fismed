@@ -21,6 +21,33 @@ func InitiateDB(db *pgxpool.Pool) {
 
 }
 
+func TanggalSekarang() time.Time {
+	location, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		fmt.Println("Error loading location:", err)
+		return time.Time{} // Mengembalikan waktu kosong jika terjadi kesalahan
+	}
+
+	// Mengambil waktu saat ini di zona waktu Asia/Jakarta
+	now := time.Now().In(location)
+	return now
+}
+
+// FormatTanggal1 mengembalikan tanggal dalam format tttt - bb - hh
+func FormatTanggal1(t time.Time) string {
+	return t.Format("2006-01-02")
+}
+
+// FormatTanggal2 mengembalikan tanggal dalam format hh - bb - tttt
+func FormatTanggal2(t time.Time) string {
+	return t.Format("02-01-2006")
+}
+
+// FormatTanggal3 mengembalikan tanggal dalam format tttt - bb - hh  jj - mm - dd
+func FormatTanggal3(t time.Time) string {
+	return t.Format("2006-01-02 15-04-05")
+}
+
 func GenerateToken(userID int, username string) (string, error) {
 	privateKey := []byte(username)
 

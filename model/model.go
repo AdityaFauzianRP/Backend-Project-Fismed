@@ -16,6 +16,7 @@ type StockBarang struct {
 type RequestID struct {
 	ID     string `json:"id,omitempty"`
 	Divisi string `json:"divisi,omitempty"`
+	Export string `json:"export,omitempty"`
 }
 
 type PerformanceInvoice struct {
