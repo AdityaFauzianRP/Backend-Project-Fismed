@@ -53,7 +53,9 @@ func Routes(router *gin.Engine) {
 	//	Pre Order API Start
 
 	router.POST("/api/purchase-order/list", preOrder.ListPO)
+	router.POST("/api/purchase-order/detail", preOrder.Detail)
 	router.POST("/api/purchase-order/inquiry", preOrder.Inquiry)
+	router.POST("/api/purchase-order/posting", preOrder.Posting)
 
 	//  Pre Order API End
 

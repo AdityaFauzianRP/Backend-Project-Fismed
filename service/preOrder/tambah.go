@@ -4,7 +4,9 @@ import (
 	"backend_project_fismed/constanta"
 	"backend_project_fismed/model"
 	"backend_project_fismed/utility"
+	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,6 +16,7 @@ import (
 func Posting(c *gin.Context) {
 	var input model.PurchaseOrder
 	//var res model.PurchaseOrder
+	var id int
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
@@ -29,15 +32,73 @@ func Posting(c *gin.Context) {
 
 	}
 
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+
 	log.Println("Data Input :", input)
 
-	if input.Divisi == constanta.Ortopedi {
+	query := `
+		INSERT INTO purchase_order (
+			nama_suplier, 
+			nomor_po, 
+			tanggal, 
+			catatan_po, 
+			prepared_by, 
+			prepared_jabatan, 
+			approved_by, 
+			approved_jabatan, 
+			created_at, 
+			created_by, 
+			updated_at, 
+			updated_by, 
+			sub_total, 
+			pajak, 
+			total
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)RETURNING id`
 
+	// Menjalankan query insert
+	err = tx.QueryRow(context.Background(), query, input.NamaSuplier, input.NomorPO, input.Tanggal,
+		input.CatatanPO, input.PreparedBy, input.PreparedJabatan, input.ApprovedBy, input.ApprovedJabatan,
+		time.Now(), "ADMIN", time.Now(), "ADMIN", input.SubTotal, input.Pajak, input.Total).Scan(&id)
+	if err != nil {
+		tx.Rollback(ctx)
+		utility.ResponseError(c, constanta.ErrQuery1)
+		return
 	}
 
-	if input.Divisi == constanta.Radiologi {
+	if len(input.Item) > 0 {
+		for i, item := range input.Item {
+			QueryItem := `
+				INSERT INTO item_buyer (
+					po_id, 
+					name, 
+					quantity, 
+					price, 
+					discount, 
+					amount
+				) VALUES ($1, $2, $3, $4, $5, $6)`
 
+			_, err = tx.Exec(context.Background(), QueryItem, id, item.Name, item.Quantity, item.Price, item.Discount, item.Amount)
+			if err != nil {
+				tx.Rollback(ctx)
+				utility.ResponseError(c, constanta.ErrQuery2)
+				return
+			}
+
+			log.Println("Data Item ke : ", i, " Berhasil di Input!")
+
+		}
 	}
+
+	if err := tx.Commit(ctx); err != nil {
+		utility.ResponseError(c, constanta.ErrCommit)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data added successfully", "status": true})
 }
 
 func Inquiry(c *gin.Context) {
@@ -67,7 +128,6 @@ func Inquiry(c *gin.Context) {
 	if len(input.Item) > 0 {
 		for i, item := range input.Item {
 			log.Println("Item Barang Ke :", i)
-			log.Println("Item Barang :", res.Item[i].Name)
 
 			res.Item[i].Name = item.Name
 			res.Item[i].Quantity = item.Quantity

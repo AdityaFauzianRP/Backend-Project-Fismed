@@ -19,4 +19,6 @@ const (
 	ErrScan4 string = "Gagal Eksekusi Scan 4"
 	ErrScan5 string = "Gagal Eksekusi Scan 5"
 	ErrScan6 string = "Gagal Eksekusi Scan 6"
+
+	ErrCommit string = "Gagal Commit Ke Database"
 )
