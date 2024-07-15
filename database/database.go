@@ -12,6 +12,8 @@ import (
 	"backend_project_fismed/utility"
 	"context"
 	"log"
+	"os"
+	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -29,20 +31,26 @@ func NewConnect() *pgxpool.Pool {
 	//  BUAT DOCKER
 	//databaseUrl := "postgres://fismed-user:boyang123@fismed-db:5432/fismed"
 
-	db, err := pgxpool.Connect(context.Background(), databaseUrl)
+	//db, err := pgxpool.Connect(context.Background(), databaseUrl)
+	//if err != nil {
+	//	log.Fatalf("Unable to connect to database: %v\n", err)
+	//}
+
+	config, err := pgxpool.ParseConfig(databaseUrl)
 	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
+		log.Fatalf("Unable to parse database URL: %v", err)
+		os.Exit(1)
 	}
 
-	//config.MaxConns = 100
-	//config.ConnConfig.ConnectTimeout = 2 * time.Second
-	//config.HealthCheckPeriod = 2 * time.Second
-	//
-	//db, err := pgxpool.ConnectConfig(context.Background(), config)
-	//if err != nil {
-	//	log.Fatalf("Unable to connect to database: %v", err)
-	//	os.Exit(1)
-	//}
+	config.MaxConns = 100
+	config.ConnConfig.ConnectTimeout = 2 * time.Second
+	config.HealthCheckPeriod = 2 * time.Second
+
+	db, err := pgxpool.ConnectConfig(context.Background(), config)
+	if err != nil {
+		log.Fatalf("Unable to connect to database: %v", err)
+		os.Exit(1)
+	}
 
 	log.Println("[--->] Success Created DB Connection...!")
 

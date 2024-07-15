@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func List(c *gin.Context) {
@@ -40,17 +41,20 @@ func List(c *gin.Context) {
 	var total int = 0
 	for rows.Next() {
 		var res model.Pemasukan
+		var tanggalAsli time.Time
 		if err := rows.Scan(
 			&res.Id,
 			&res.Nama,
 			&res.Nominal,
 			&res.Amount,
-			&res.Tanggal,
+			&tanggalAsli,
 		); err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
+
+		res.Tanggal = utility.FormatTanggal1(tanggalAsli)
 
 		nominal, _ := strconv.Atoi(res.Nominal)
 		total = total + nominal
