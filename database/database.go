@@ -4,6 +4,7 @@ import (
 	"backend_project_fismed/service/authentikasi"
 	"backend_project_fismed/service/customerProfilling"
 	"backend_project_fismed/service/pemasukan"
+	"backend_project_fismed/service/pengeluaran"
 	"backend_project_fismed/service/piutang"
 	"backend_project_fismed/service/preOrder"
 	"backend_project_fismed/service/proformaInvoice"
@@ -63,6 +64,7 @@ func NewConnect() *pgxpool.Pool {
 	salesOrder.InitiateDB(db)
 	pemasukan.InitiateDB(db)
 	piutang.InitiateDB(db)
+	pengeluaran.InitiateDB(db)
 
 	return db
 }
