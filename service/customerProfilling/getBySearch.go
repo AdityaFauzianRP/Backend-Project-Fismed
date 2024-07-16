@@ -40,7 +40,7 @@ func GetBySearch(c *gin.Context) {
 	query := `
 		SELECT 
 			id,
-			COALESCE(nama_company, '') AS "name",
+			COALESCE(nama_company, '') AS nama_company,
 			COALESCE(address_company, '') AS address_company,
 			COALESCE(npwp_address, '') AS npwp_address,
 			COALESCE(npwp, '') AS npwp,
@@ -64,7 +64,7 @@ func GetBySearch(c *gin.Context) {
 			COALESCE(top, '') AS top
 		FROM 
 			public.customer
-		where name = $1;
+		where nama_company = $1;
 	`
 
 	rows, err := tx.Query(ctx, query, input.Name)
@@ -137,7 +137,7 @@ func GetBySearch(c *gin.Context) {
 
 	QueryHistory := `
 		select 
-		    a."name" , 
+		    a.nama_company , 
 		    a.quantity  
 		from 
 		    order_items a, performance_invoice b 
