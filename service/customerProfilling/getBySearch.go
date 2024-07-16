@@ -70,7 +70,7 @@ func GetBySearch(c *gin.Context) {
 	rows, err := tx.Query(ctx, query, input.Name)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
 	defer rows.Close()
@@ -129,15 +129,15 @@ func GetBySearch(c *gin.Context) {
 	err = tx.QueryRow(ctx, countPI, response[0].ID).Scan(&jumlahPI)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
 
-	log.Println("[--->]", "Nama Customer :", response[0].Name)
+	log.Println("[--->]", "Nama Customer :", response[0].ID)
 
 	QueryHistory := `
 		select 
-		    a.nama_company , 
+		    a."name" , 
 		    a.quantity  
 		from 
 		    order_items a, performance_invoice b 
@@ -149,7 +149,7 @@ func GetBySearch(c *gin.Context) {
 	rows, err = tx.Query(ctx, QueryHistory, response[0].ID)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
 	defer rows.Close()
