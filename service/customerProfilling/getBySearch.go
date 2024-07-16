@@ -40,7 +40,7 @@ func GetBySearch(c *gin.Context) {
 	query := `
 		SELECT 
 			id,
-			COALESCE("name", '') AS "name",
+			COALESCE(nama_company, '') AS "name",
 			COALESCE(address_company, '') AS address_company,
 			COALESCE(npwp_address, '') AS npwp_address,
 			COALESCE(npwp, '') AS npwp,
