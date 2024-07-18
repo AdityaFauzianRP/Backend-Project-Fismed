@@ -1,0 +1,10 @@
+services:
+  fismed_be:
+    image: fismed-be:latest
+    container_name: fismed-be-dev
+    build:
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8080:8080
+    
