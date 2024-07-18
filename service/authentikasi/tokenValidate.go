@@ -35,6 +35,8 @@ func TokenValidate(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
+
 	QueryGetByToke := `
 		select u.id, u.username from users u where u.token = $1;
 	`

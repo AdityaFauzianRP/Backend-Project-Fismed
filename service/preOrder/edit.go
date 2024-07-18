@@ -156,6 +156,7 @@ func Edit_Finance(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	if input.Status == "DITOLAK" {
 		query := `

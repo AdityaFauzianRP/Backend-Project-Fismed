@@ -10,86 +10,70 @@ import (
 	"backend_project_fismed/service/proformaInvoice"
 	"backend_project_fismed/service/salesOrder"
 	"backend_project_fismed/service/stockBarang"
+	"log"
+
 	"github.com/gin-gonic/gin"
 )
 
 func Routes(router *gin.Engine) {
+	log.Println("Setting up routes")
 
-	router.POST("/api/login", authentikasi.Login)
-	router.POST("/api/token-validate", authentikasi.TokenValidate)
-	//router.POST("/api/image", authentikasi.Image)
+	router.POST("/api/login", logMiddleware(authentikasi.Login))
+	router.POST("/api/token-validate", logMiddleware(authentikasi.TokenValidate))
 
-	//	Customer Profilling API Start
+	// Customer Profilling API
+	router.POST("/api/customer-profilling/add", logMiddleware(customerProfilling.Add))
+	router.POST("/api/customer-profilling/get-tax-code", logMiddleware(customerProfilling.GetTaxCode))
+	router.POST("/api/customer-profilling/get-by-search", logMiddleware(customerProfilling.GetBySearch))
 
-	router.POST("/api/customer-profilling/add", customerProfilling.Add)
-	router.POST("/api/customer-profilling/get-tax-code", customerProfilling.GetTaxCode)
-	router.POST("/api/customer-profilling/get-by-search", customerProfilling.GetBySearch)
+	// Pro forma Invoice API
+	router.POST("/api/proforma-invoice/get-all-list", logMiddleware(proformaInvoice.GetAllList))
+	router.POST("/api/proforma-invoice/inquiry", logMiddleware(proformaInvoice.Inquiry))
+	router.POST("/api/proforma-invoice/posting", logMiddleware(proformaInvoice.Posting))
+	router.POST("/api/proforma-invoice/detailPI", logMiddleware(proformaInvoice.DetailPI))
+	router.POST("/api/proforma-invoice/editPI-inquiry", logMiddleware(proformaInvoice.EditPI))
+	router.POST("/api/proforma-invoice/editPI-posting", logMiddleware(proformaInvoice.PostingEdit_PI))
+	router.POST("/api/proforma-invoice/editPI-admin", logMiddleware(proformaInvoice.EditAdmin))
+	router.POST("/api/proforma-invoice/divisi-list", logMiddleware(proformaInvoice.DivisiList))
+	router.POST("/api/proforma-invoice/rs-list", logMiddleware(proformaInvoice.RumahSakitList))
 
-	//	Customer Profilling API End
+	// Stock Barang API
+	router.POST("/api/stock-barang/add", logMiddleware(stockBarang.Add))
+	router.POST("/api/stock-barang/detail", logMiddleware(stockBarang.Detail))
+	router.POST("/api/stock-barang/list", logMiddleware(stockBarang.List))
+	router.POST("/api/stock-barang/edit", logMiddleware(stockBarang.Edit))
+	router.POST("/api/stock-barang/delete", logMiddleware(stockBarang.Delete))
 
-	//	Pro forma Invoice API Start
+	// Pre Order API
+	router.POST("/api/purchase-order/list", logMiddleware(preOrder.ListPO))
+	router.POST("/api/purchase-order/detail", logMiddleware(preOrder.Detail))
+	router.POST("/api/purchase-order/inquiry", logMiddleware(preOrder.Inquiry))
+	router.POST("/api/purchase-order/posting", logMiddleware(preOrder.Posting))
+	router.POST("/api/purchase-order/edit/finance", logMiddleware(preOrder.Edit_Finance))
+	router.POST("/api/purchase-order/edit/inquiry", logMiddleware(preOrder.Edit_Admin))
+	router.POST("/api/purchase-order/edit/posting", logMiddleware(preOrder.Edit_Finance))
 
-	router.POST("/api/proforma-invoice/get-all-list", proformaInvoice.GetAllList)
-	router.POST("/api/proforma-invoice/inquiry", proformaInvoice.Inquiry)
-	router.POST("/api/proforma-invoice/posting", proformaInvoice.Posting)
-	router.POST("/api/proforma-invoice/detailPI", proformaInvoice.DetailPI)
-	router.POST("/api/proforma-invoice/editPI-inquiry", proformaInvoice.EditPI)
-	router.POST("/api/proforma-invoice/editPI-posting", proformaInvoice.PostingEdit_PI)
-	router.POST("/api/proforma-invoice/editPI-admin", proformaInvoice.EditAdmin)
-	router.POST("/api/proforma-invoice/divisi-list", proformaInvoice.DivisiList)
-	router.POST("/api/proforma-invoice/rs-list", proformaInvoice.RumahSakitList)
+	// Sales Order API
+	router.POST("/api/sales_order/list", logMiddleware(salesOrder.ListDaftar_PO))
 
-	//	Pro forma Invoice API End
+	// Pemasukan API
+	router.POST("/api/pemasukan/list", logMiddleware(pemasukan.List))
 
-	//	Stock Barang API Start
+	// Piutang API
+	router.POST("/api/piutang/list", logMiddleware(piutang.List))
 
-	router.POST("/api/stock-barang/add", stockBarang.Add)
-	router.POST("/api/stock-barang/detail", stockBarang.Detail)
-	router.POST("/api/stock-barang/list", stockBarang.List)
-	router.POST("/api/stock-barang/edit", stockBarang.Edit)
-	router.POST("/api/stock-barang/delete", stockBarang.Delete)
+	// Hutang API
+	router.POST("/api/hutang/list", logMiddleware(piutang.List))
 
-	//	Stock Barang API End
+	// Pengeluaran API
+	router.POST("/api/pengeluaran/list", logMiddleware(pengeluaran.List))
 
-	//	Pre Order API Start
+	log.Println("Routes setup completed")
+}
 
-	router.POST("/api/purchase-order/list", preOrder.ListPO)
-	router.POST("/api/purchase-order/detail", preOrder.Detail)
-	router.POST("/api/purchase-order/inquiry", preOrder.Inquiry)
-	router.POST("/api/purchase-order/posting", preOrder.Posting)
-	router.POST("/api/purchase-order/edit/finance", preOrder.Edit_Finance)
-	router.POST("/api/purchase-order/edit/inquiry", preOrder.Edit_Admin)
-	router.POST("/api/purchase-order/edit/posting", preOrder.Edit_Finance)
-
-	//  Pre Order API End
-
-	//	Sales Order API Start
-
-	router.POST("/api/sales_order/list", salesOrder.ListDaftar_PO)
-
-	//  Sales Order API End
-
-	//	Pemasukan API Start
-
-	router.POST("/api/pemasukan/list", pemasukan.List)
-
-	//  Pemasukan API End
-
-	//	Piutang API Start
-
-	router.POST("/api/piutang/list", piutang.List)
-
-	//  Piutang API End
-
-	//	Hutang API Start
-
-	router.POST("/api/hutang/list", piutang.List)
-
-	//  Hutang API End
-
-	//	Pengeluaran API Start
-
-	router.POST("/api/pengeluaran/list", pengeluaran.List)
-
-	//  Pengeluaran API End
+func logMiddleware(handler gin.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		log.Printf("Handler hit: %s %s", c.Request.Method, c.Request.URL.Path)
+		handler(c)
+	}
 }

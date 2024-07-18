@@ -32,6 +32,7 @@ func Detail(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := "select * from stock_items where id = $1"
 
