@@ -2,11 +2,13 @@ package salesOrder
 
 import (
 	"backend_project_fismed/model"
+	"backend_project_fismed/utility"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
+	"time"
 )
 
 func ListDaftar_PO(c *gin.Context) {
@@ -20,22 +22,24 @@ func ListDaftar_PO(c *gin.Context) {
 
 	query := `
 		select 
-			COALESCE(id, 0) AS id,
-			COALESCE(customer_id, 0) AS customer_id,
-			COALESCE(status, '') AS status,
-			COALESCE(divisi, '') AS divisi,
-			COALESCE(invoice_number, '') AS invoice_number,
-			COALESCE(po_number, '') AS po_number,
-			COALESCE(due_date , '') AS due_date,
-			COALESCE(doctor_name, '') AS doctor_name,
-			COALESCE(patient_name, '') AS patient_name,
-			COALESCE(pajak, '') AS pajak,
-			COALESCE(total, '') AS total,
-			COALESCE(sub_total, '') AS sub_total,
-			COALESCE(tanggal_tindakan, '') AS tanggal_tindakan,
-			COALESCE(rm, '') AS rm,
-			COALESCE(number_si, '') AS number_si
-		from performance_invoice pi2 where status = 'Diterima' order by id asc;
+			COALESCE(a.id, 0) AS id,
+			COALESCE(a.customer_id, 0) AS customer_id,
+			COALESCE(a.status, '') AS status,
+			COALESCE(a.divisi, '') AS divisi,
+			COALESCE(a.invoice_number, '') AS invoice_number,
+			COALESCE(a.po_number, '') AS po_number,
+			COALESCE(a.due_date , '') AS due_date,
+			COALESCE(a.doctor_name, '') AS doctor_name,
+			COALESCE(a.patient_name, '') AS patient_name,
+			COALESCE(a.pajak, '') AS pajak,
+			COALESCE(a.total, '') AS total,
+			COALESCE(a.sub_total, '') AS sub_total,
+			COALESCE(a.tanggal_tindakan, '') AS tanggal_tindakan,
+			COALESCE(a.rm, '') AS rm,
+			COALESCE(a.number_si, '') AS number_si,
+			a.created_at ,
+			c.nama_company 
+		from performance_invoice a, customer c  where status = 'Diterima' and a.customer_id = c.id  order by id asc;
 	`
 
 	row, err := tx.Query(ctx, query)
@@ -53,6 +57,7 @@ func ListDaftar_PO(c *gin.Context) {
 
 	for row.Next() {
 		var ambil model.PerformanceInvoiceDetail
+		var tanggalAsli time.Time
 		err := row.Scan(
 			&ambil.ID,
 			&ambil.CustomerID,
@@ -69,6 +74,8 @@ func ListDaftar_PO(c *gin.Context) {
 			&ambil.TanggalTindakan,
 			&ambil.RM,
 			&ambil.NumberSI,
+			&tanggalAsli,
+			&ambil.Customer,
 		)
 
 		if err != nil {
@@ -76,6 +83,8 @@ func ListDaftar_PO(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to Scan Data !", "status": false})
 			return
 		}
+
+		ambil.Tanggal = utility.FormatTanggal1(tanggalAsli)
 
 		Tampung_data = append(Tampung_data, ambil)
 	}

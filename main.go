@@ -1,55 +1,69 @@
 package main
 
 import (
-	"backend_project_fismed/database"
-	"backend_project_fismed/route"
-	"log"
-
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"fmt"
+	"strconv"
 )
 
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, x-requested-with")
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-		c.Next()
-	}
-}
-
 func main() {
+	qrCode := "00020101021126660015ID.OR.GPNQR.WWW01189360042500000000060214PDP123456789150303UME51450015ID.OR.GPNQR.WWW0215IDSM110121022120303UME520458125303360540822000.005502015802ID5914BAKMIE GM AEON6007TANGSEL61051034062110707SGLWO016304FCC3"
 
-	database.NewConnect()
+	i := 0
+	for i < len(qrCode) {
+		if i+2 > len(qrCode) {
+			break
+		}
+		tag := qrCode[i : i+2]
+		i += 2
 
-	gin.SetMode(gin.ReleaseMode)
+		if i+2 > len(qrCode) {
+			break
+		}
+		length, err := strconv.Atoi(qrCode[i : i+2])
+		if err != nil {
+			break
+		}
+		i += 2
 
-	router := gin.Default()
+		if i+length > len(qrCode) {
+			break
+		}
+		value := qrCode[i : i+length]
+		i += length
 
-	router.Use(CORSMiddleware())
+		if len(value) >= 3 {
+			merchantCriteria := value[len(value)-3:]
+			fmt.Printf("Tag: %s, Length: %d, Value: %s, Merchant Criteria: %s\n", tag, length, value, merchantCriteria)
+		}
 
-	route.Routes(router)
+		// Check for subtags within the value
+		j := 0
+		for j < len(value) {
+			if j+2 > len(value) {
+				break
+			}
+			subTag := value[j : j+2]
+			j += 2
 
-	router.Use(gin.Logger())
+			if j+2 > len(value) {
+				break
+			}
+			subLength, err := strconv.Atoi(value[j : j+2])
+			if err != nil {
+				break
+			}
+			j += 2
 
-	router.Use(gin.Recovery())
+			if j+subLength > len(value) {
+				break
+			}
+			subValue := value[j : j+subLength]
+			j += subLength
 
-	gin.SetMode(gin.ReleaseMode)
-
-	server := &http.Server{
-		Addr:    ":8080",
-		Handler: router,
+			if len(subValue) >= 3 {
+				merchantCriteria := subValue[len(subValue)-3:]
+				fmt.Printf("  SubTag: %s, Length: %d, Value: %s, Merchant Criteria: %s\n", subTag, subLength, subValue, merchantCriteria)
+			}
+		}
 	}
-
-	log.Println("[--->] Running On Port", server.Addr)
-
-	if err := server.ListenAndServe(); err != nil {
-		panic(err)
-	}
-
 }

@@ -166,3 +166,12 @@ func RupiahToNumber(rupiah string) string {
 	fmt.Printf("Angka biasa: %.0f\n", rupiah)
 	return rupiah
 }
+
+func PersenToNumber(persen string) string {
+	// Hilangkan "Rp." dan titik-titik
+	persen = strings.Replace(persen, "%", "", -1)
+
+	// Konversi string ke float64
+	fmt.Printf("Angka biasa: %.0f\n", persen)
+	return persen
+}

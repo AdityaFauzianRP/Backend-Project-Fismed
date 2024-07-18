@@ -40,7 +40,7 @@ func GetBySearch(c *gin.Context) {
 	query := `
 		SELECT 
 			id,
-			COALESCE("name", '') AS "name",
+			COALESCE(nama_company, '') AS nama_company,
 			COALESCE(address_company, '') AS address_company,
 			COALESCE(npwp_address, '') AS npwp_address,
 			COALESCE(npwp, '') AS npwp,
@@ -64,13 +64,13 @@ func GetBySearch(c *gin.Context) {
 			COALESCE(top, '') AS top
 		FROM 
 			public.customer
-		where name = $1;
+		where nama_company = $1;
 	`
 
 	rows, err := tx.Query(ctx, query, input.Name)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
 	defer rows.Close()
@@ -129,11 +129,11 @@ func GetBySearch(c *gin.Context) {
 	err = tx.QueryRow(ctx, countPI, response[0].ID).Scan(&jumlahPI)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
 
-	log.Println("[--->]", "Nama Customer :", response[0].Name)
+	log.Println("[--->]", "Nama Customer :", response[0].ID)
 
 	QueryHistory := `
 		select 
@@ -149,7 +149,7 @@ func GetBySearch(c *gin.Context) {
 	rows, err = tx.Query(ctx, QueryHistory, response[0].ID)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute tax code query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
 	defer rows.Close()

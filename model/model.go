@@ -92,6 +92,7 @@ type ResItem struct {
 type Customer struct {
 	ID                 int    `json:"id,omitempty"`
 	Name               string `json:"name,omitempty"`
+	NameCompany        string `json:"nama_company,omitempty"`
 	AddressCompany     string `json:"address_company,omitempty"`
 	NPWPAddress        string `json:"npwp_address,omitempty"`
 	NPWP               string `json:"npwp,omitempty"`
@@ -136,6 +137,8 @@ type PerformanceInvoiceDetail struct {
 	Total           string          `json:"total,omitempty"`
 	TotalRP         string          `json:"RP_total,omitempty"`
 	Reason          string          `json:"reason,omitempty"`
+	Tanggal         string          `json:"tanggal,omitempty"`
+	Customer        string          `json:"nama_customer,omitempty"`
 	ItemDetailPI    []ResItemDetail `json:"item_detail_pi,omitempty"`
 }
 

@@ -15,7 +15,7 @@ func RumahSakitList(c *gin.Context) {
 		panic(err.Error())
 	}
 
-	query := "SELECT id, COALESCE(name, 'default_name') AS name, COALESCE(address_company, 'default_address') AS address_company FROM customer order by id asc ;"
+	query := "SELECT id, COALESCE(nama_company, 'default_name') AS name, COALESCE(address_company, 'default_address') AS address_company FROM customer order by id asc ;"
 
 	rows, err := tx.Query(ctx, query)
 	if err != nil {

@@ -27,6 +27,7 @@ func ListPO(c *gin.Context) {
 			COALESCE(prepared_jabatan, '') AS prepared_jabatan,
 			COALESCE(approved_by, '') AS approved_by,
 			COALESCE(approved_jabatan, '') AS approved_jabatan,
+			COALESCE(status, '') AS status,
 			COALESCE(sub_total, '') AS sub_total,
 			COALESCE(pajak, '') AS pajak,
 			COALESCE(total, '') AS total
@@ -54,6 +55,7 @@ func ListPO(c *gin.Context) {
 			&res.PreparedJabatan,
 			&res.ApprovedBy,
 			&res.ApprovedJabatan,
+			&res.Status,
 			&res.SubTotal,
 			&res.Pajak,
 			&res.Total,

@@ -1,4 +1,4 @@
-package piutang
+package pengeluaran
 
 import (
 	"backend_project_fismed/model"
@@ -26,7 +26,7 @@ func List(c *gin.Context) {
 			COALESCE(nominal, '') AS nominal,
 			COALESCE(amount, '') AS amount,
 			tanggal
-		from piutang p order by id desc 
+		from pengeluaran p order by id desc 
 	`
 
 	rows, err := tx.Query(ctx, query)

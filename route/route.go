@@ -4,6 +4,7 @@ import (
 	"backend_project_fismed/service/authentikasi"
 	"backend_project_fismed/service/customerProfilling"
 	"backend_project_fismed/service/pemasukan"
+	"backend_project_fismed/service/pengeluaran"
 	"backend_project_fismed/service/piutang"
 	"backend_project_fismed/service/preOrder"
 	"backend_project_fismed/service/proformaInvoice"
@@ -56,6 +57,9 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/purchase-order/detail", preOrder.Detail)
 	router.POST("/api/purchase-order/inquiry", preOrder.Inquiry)
 	router.POST("/api/purchase-order/posting", preOrder.Posting)
+	router.POST("/api/purchase-order/edit/finance", preOrder.Edit_Finance)
+	router.POST("/api/purchase-order/edit/inquiry", preOrder.Edit_Admin)
+	router.POST("/api/purchase-order/edit/posting", preOrder.Edit_Finance)
 
 	//  Pre Order API End
 
@@ -76,4 +80,16 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/piutang/list", piutang.List)
 
 	//  Piutang API End
+
+	//	Hutang API Start
+
+	router.POST("/api/hutang/list", piutang.List)
+
+	//  Hutang API End
+
+	//	Pengeluaran API Start
+
+	router.POST("/api/pengeluaran/list", pengeluaran.List)
+
+	//  Pengeluaran API End
 }
