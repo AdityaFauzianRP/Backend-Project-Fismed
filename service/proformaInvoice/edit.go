@@ -133,6 +133,7 @@ func PostingEdit_PI(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	if input.Divisi == "Ortopedi" {
 		query := `
@@ -308,6 +309,7 @@ func EditAdmin(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	log.Println("tx.DBConnection :", tx)
 

@@ -31,6 +31,7 @@ func Delete(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := "DELETE FROM stock_items WHERE id = $1"
 	_, err = tx.Exec(ctx, query, input.ID)

@@ -15,6 +15,7 @@ func ListPO(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := `
 		SELECT 

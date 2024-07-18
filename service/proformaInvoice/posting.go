@@ -37,6 +37,7 @@ func Posting(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	if input.IdDivisi == "1" {
 		log.Println("[--->]", "Proses Input Ortopedi!")

@@ -18,6 +18,7 @@ func GetTaxCode(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := "select id , tax  from tax_code tc"
 

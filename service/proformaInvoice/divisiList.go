@@ -16,6 +16,7 @@ func DivisiList(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := "select id, COALESCE(name, 'default_name') AS name from divisi order by id asc;"
 

@@ -14,6 +14,7 @@ func RumahSakitList(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := "SELECT id, COALESCE(nama_company, 'default_name') AS name, COALESCE(address_company, 'default_address') AS address_company FROM customer order by id asc ;"
 

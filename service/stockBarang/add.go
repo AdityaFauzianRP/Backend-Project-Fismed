@@ -32,6 +32,7 @@ func Add(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := `INSERT INTO stock_items (name, total, price, created_at, created_by, updated_at, updated_by)
 	VALUES (

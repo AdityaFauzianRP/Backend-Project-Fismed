@@ -19,6 +19,7 @@ func ListDaftar_PO(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := `
 		select 

@@ -31,6 +31,7 @@ func Add(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	if input.Name != "" {
 		query := `INSERT INTO customer (

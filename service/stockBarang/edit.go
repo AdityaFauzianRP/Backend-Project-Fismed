@@ -31,6 +31,7 @@ func Edit(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := `
 		UPDATE stock_items
