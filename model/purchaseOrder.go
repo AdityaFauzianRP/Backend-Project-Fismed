@@ -10,7 +10,6 @@ type PurchaseOrder struct {
 	PreparedJabatan string      `json:"prepared_jabatan,omitempty"`
 	ApprovedBy      string      `json:"approved_by,omitempty"`
 	ApprovedJabatan string      `json:"approved_jabatan,omitempty"`
-	Status          string      `json:"status,omitempty"`
 	SubTotal        string      `json:"sub_total,omitempty"`
 	Pajak           string      `json:"pajak,omitempty"`
 	Total           string      `json:"total,omitempty"`
@@ -18,6 +17,8 @@ type PurchaseOrder struct {
 	CreatedBy       string      `json:"created_by,omitempty"`
 	UpdatedAt       string      `json:"updated_at,omitempty"`
 	UpdatedBy       string      `json:"updated_by,omitempty"`
+	Massage         string      `json:"message,omitempty"`
+	Status          string      `json:"status,omitempty"`
 	Item            []ItemBuyer `json:"item,omitempty"`
 
 	Reason string `json:"reason,omitempty"`
