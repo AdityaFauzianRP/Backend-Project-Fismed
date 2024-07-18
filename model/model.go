@@ -93,7 +93,7 @@ type Customer struct {
 	ID                 int    `json:"id,omitempty"`
 	Name               string `json:"name,omitempty"`
 	NameCompany        string `json:"nama_company,omitempty"`
-	AddressCompany     string `json:"address,omitempty"`
+	AddressCompany     string `json:"address_company,omitempty"`
 	NPWPAddress        string `json:"npwp_address,omitempty"`
 	NPWP               string `json:"npwp,omitempty"`
 	IpakNumber         string `json:"ipak_number,omitempty"`
