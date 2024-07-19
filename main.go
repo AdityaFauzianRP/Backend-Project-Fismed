@@ -18,23 +18,23 @@ func CORSMiddleware() gin.HandlerFunc {
 		log.Println("CORS Middleware hit - Before setting headers")
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "*, x-requested-with")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, x-requested-with")
 
 		log.Println("CORS Middleware hit - Before c.Next()")
-		//if c.Request.Method == "OPTIONS" {
-		//	log.Println("CORS Middleware hit - OPTIONS request")
-		//	c.AbortWithStatus(http.StatusNoContent)
-		//	return
-		//}
+		if c.Request.Method == "OPTIONS" {
+			log.Println("CORS Middleware hit - OPTIONS request")
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
 
-		// Set timeout for handling the request
-		//ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
-		//defer cancel()
+		//Set timeout for handling the request
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+		defer cancel()
 
-		//c.Request = c.Request.WithContext(ctx)
+		c.Request = c.Request.WithContext(ctx)
 
-		//c.Next()
+		c.Next()
 
 		log.Println("CORS Middleware hit - After c.Next()")
 	}
