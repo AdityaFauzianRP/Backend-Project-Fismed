@@ -15,6 +15,7 @@ func GetAllList(c *gin.Context) {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
 	query := "select COALESCE(id, 0) AS id, COALESCE(customer_id, 0) AS customer_id, COALESCE(status, '') AS status, COALESCE(divisi, '') AS divisi, COALESCE(invoice_number, '') AS invoice_number, COALESCE(po_number, '') AS po_number,  COALESCE(sub_total, '') AS sub_total, COALESCE(pajak, '') AS pajak, COALESCE(total, '') AS total, TO_CHAR(COALESCE(created_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS created_at, COALESCE(created_by, '') AS created_by, TO_CHAR(COALESCE(update_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS update_at, COALESCE(updated_by, '') AS updated_by from performance_invoice ORDER BY id;"
 
