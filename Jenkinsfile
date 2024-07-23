@@ -47,7 +47,7 @@ pipeline {
         stage("Build Docker image") {
             steps{
                 echo "Build image"
-                sh 'docker compose -f docker-compose.yaml build'
+                sh 'docker compose build'
                 
             }
         }
@@ -60,9 +60,9 @@ pipeline {
            
                 sh '''
                     docker stop fismed-be-dev
-                    docker compose -f docker-compose.yaml down
+                    docker compose down
                     docker rm fismed-be-dev
-                    docker compose -f docker-compose.yaml up -d
+                    docker compose up -d
                 '''
                 
             }
