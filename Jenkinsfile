@@ -59,6 +59,8 @@ pipeline {
                 echo "Push Image"
            
                 sh '''
+                  docker stop fismed-be-dev
+                  docker rm fismed-be-dev
                   docker run -d --name fismed-be-dev --restart always -p 8080:8080 fismed-be:latest
                 '''
                 
