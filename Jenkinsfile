@@ -3,7 +3,7 @@ pipeline {
     // tools {
     //     go 'go1.21.6'
     // }
-        
+        //tesss
     environment {
         // ANSIBLE_CONFIG = '/etc/ansible/ansible.cfg'
         // PRIVATE_KEY_PATH = '/etc/ansible/morokey.pem'
