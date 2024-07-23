@@ -47,7 +47,7 @@ pipeline {
         stage("Build Docker image") {
             steps{
                 echo "Build image"
-                sh '/usr/libexec/docker/cli-plugins/docker-compose -f docker-compose.yaml build'
+                sh 'docker build -t fismed-be:latest .'
                 
             }
         }
@@ -59,10 +59,7 @@ pipeline {
                 echo "Push Image"
            
                 sh '''
-                    docker stop fismed-be-dev
-                    docker compose down
-                    docker rm fismed-be-dev
-                    docker compose up -d
+                  docker run -d --name fismed-be-dev --restart always -p 8080:8080 fismed-be:latest
                 '''
                 
             }
