@@ -47,7 +47,7 @@ pipeline {
         stage("Build Docker image") {
             steps{
                 echo "Build image"
-                sh 'docker compose build'
+                sh '/usr/libexec/docker/cli-plugins/docker-compose -f docker-compose.yaml build'
                 
             }
         }
