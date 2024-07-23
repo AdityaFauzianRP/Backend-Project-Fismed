@@ -17,7 +17,7 @@ pipeline {
         // LOGIN_CREDS = credentials('docker_login_creds')
         // HELM_NAME = "tutor-golang"
         DOCKER_REGISTRY="docker.io"
-        DOCKER_USER="fismed-user"
+        DOCKER_CONTAINER="fismed-be-dev"
         DOCKER_IMAGE="fismed-be"
         // DOCKER_VERSION=sh (returnStdout: true, script: 'echo v$(./git-buildnumber)').trim()
         // HELM_REPO="oci://registry-1.docker.io/solusik8s"
@@ -60,7 +60,9 @@ pipeline {
                 echo "Push Image"
            
                 sh '''
+                    docker stop fismed-be-dev
                     docker compose -f docker-compose.yaml down
+                    docker rm fismed-be-dev
                     docker compose -f docker-compose.yaml up -d
                 '''
                 
