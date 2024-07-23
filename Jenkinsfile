@@ -14,12 +14,12 @@ pipeline {
         // GO114MODULE = 'on'
         // CGO_ENABLED = 0 
         // GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
-        LOGIN_CREDS = credentials('docker_login_creds')
+        // LOGIN_CREDS = credentials('docker_login_creds')
         // HELM_NAME = "tutor-golang"
         DOCKER_REGISTRY="docker.io"
         DOCKER_USER="fismed-user"
         DOCKER_IMAGE="fismed-be"
-        DOCKER_VERSION=sh (returnStdout: true, script: 'echo v$(./git-buildnumber)').trim()
+        // DOCKER_VERSION=sh (returnStdout: true, script: 'echo v$(./git-buildnumber)').trim()
         // HELM_REPO="oci://registry-1.docker.io/solusik8s"
         // HELM_CHART="steradian"
         // HELM_VERSION="1.0.2"
