@@ -47,9 +47,8 @@ pipeline {
         stage("Build Docker image") {
             steps{
                 echo "Build image"
-                sh '''
-                    docker compose -f docker-compose.yaml build
-                '''
+                sh 'docker compose -f docker-compose.yaml build'
+                
             }
         }
 
