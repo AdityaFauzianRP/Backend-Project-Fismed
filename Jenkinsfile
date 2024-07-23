@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent {label "jenkins-local"}
     // tools {
     //     go 'go1.21.6'
     // }
