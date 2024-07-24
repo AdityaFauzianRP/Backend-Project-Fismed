@@ -10,7 +10,7 @@ pipeline {
         // ANSIBLE_LOCAL_TEMP = '/tmp/ansible_tmp'
         // LOGIN_CREDS = credentials('docker_login_creds')
         // ANSIBLE_PRIVATE_KEY=credentials('SOLO-PRIVATE-KEY') 
-//test
+//tests
         // GO114MODULE = 'on'
         // CGO_ENABLED = 0 
         // GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
