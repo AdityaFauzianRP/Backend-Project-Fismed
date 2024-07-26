@@ -13,7 +13,7 @@ WORKDIR /app
 COPY . .
 
 # Build the Go application without version control information
-RUN go build -o backend_project_fismed -buildvcs=false
+RUN go build -buildvcs=false
 
 # Use a smaller Alpine Linux image for the final stage
 FROM alpine:3.14
