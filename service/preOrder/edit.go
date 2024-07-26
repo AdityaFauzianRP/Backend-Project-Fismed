@@ -35,7 +35,7 @@ func Edit_Admin(c *gin.Context) {
 	log.Println("Data Input :", input)
 
 	res.Item = make([]model.ItemBuyer, len(input.Item))
-	res.Item_deleted = input.Item_deleted
+	res.ItemDeleted = input.ItemDeleted
 	res.ID = input.ID
 
 	var Subtotal int
@@ -335,8 +335,8 @@ func Posting_Edit_admin(c *gin.Context) {
 		}
 	}
 
-	if len(input.Item_deleted) > 0 {
-		for _, hapus := range input.Item_deleted {
+	if len(input.ItemDeleted) > 0 {
+		for _, hapus := range input.ItemDeleted {
 			if hapus.ID != 0 {
 				queryDeleter := "DELETE FROM item_buyer WHERE id = $1"
 				_, err = tx.Exec(ctx, queryDeleter, hapus.ID)

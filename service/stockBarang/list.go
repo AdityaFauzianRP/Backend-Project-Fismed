@@ -18,7 +18,7 @@ func List(c *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	query := "select * from stock_items"
+	query := "SELECT id, name, total, price, created_at, created_by, updated_at, updated_by FROM public.stock_items;"
 
 	rows, err := tx.Query(ctx, query)
 	if err != nil {
