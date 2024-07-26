@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
 	"net/http"
+	"strconv"
 )
 
 func Detail(c *gin.Context) {
@@ -90,7 +91,7 @@ func Detail(c *gin.Context) {
 			COALESCE(name, '') AS name,
 			COALESCE(quantity, '') AS quantity,
 			COALESCE(price, '') AS price,
-			COALESCE(discount::TEXT, '0') || '%' AS discount,
+			COALESCE(discount::TEXT, '0') || '' AS discount,
 			COALESCE(amount, '') AS amount
 		FROM item_buyer WHERE po_id = $1;
 	`
@@ -110,7 +111,7 @@ func Detail(c *gin.Context) {
 			&get.POID,
 			&get.Name,
 			&get.Quantity,
-			&get.Price,
+			&get.PriceRP,
 			&get.Discount,
 			&get.Amount,
 		); err != nil {
@@ -121,6 +122,45 @@ func Detail(c *gin.Context) {
 
 		resItem = append(resItem, get)
 	}
+
+	var subtotaltampung int = 0
+	var totaltampung int = 0
+	var pajaktampung int = 0
+
+	if len(resItem) > 0 {
+		for i, item := range resItem {
+			harga, _ := strconv.Atoi(utility.RupiahToNumber(item.PriceRP))
+			quantity, _ := strconv.Atoi(item.Quantity)
+			subtotalitem := 0
+			subtotalitem = subtotalitem + (harga * quantity)
+
+			item.Amount = strconv.Itoa(subtotalitem)
+
+			subtotaltampung = subtotaltampung + subtotalitem
+
+			resItem[i].Price = utility.RupiahToNumber(item.PriceRP)
+
+		}
+	}
+
+	var subtotaltampungString string = ""
+	var totaltampungString string = ""
+	var pajaktampungString string = ""
+
+	pajaktampung = subtotaltampung * 11 / 100
+	totaltampung = pajaktampung + subtotaltampung
+
+	subtotaltampungString = strconv.Itoa(subtotaltampung)
+	totaltampungString = strconv.Itoa(totaltampung)
+	pajaktampungString = strconv.Itoa(pajaktampung)
+
+	res.SubTotalRP = "Rp. " + utility.FormatRupiah(subtotaltampungString)
+	res.TotalRP = "Rp. " + utility.FormatRupiah(totaltampungString)
+	res.PajakRP = "Rp. " + utility.FormatRupiah(pajaktampungString)
+
+	res.SubTotal = subtotaltampungString
+	res.Total = totaltampungString
+	res.Pajak = pajaktampungString
 
 	res.Item = resItem
 

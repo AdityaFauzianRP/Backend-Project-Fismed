@@ -60,15 +60,11 @@ func main() {
 
 	log.Printf("[--->] Running On Port %s", server.Addr)
 
-	// Wait for interrupt signal to gracefully shut down the server with
-	// a timeout of 5 seconds.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Println("Shutting down server...")
 
-	// The context is used to inform the server it has 5 seconds to finish
-	// the request it is currently handling
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
