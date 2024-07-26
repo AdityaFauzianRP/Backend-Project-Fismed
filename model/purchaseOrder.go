@@ -13,6 +13,9 @@ type PurchaseOrder struct {
 	SubTotal        string      `json:"sub_total,omitempty"`
 	Pajak           string      `json:"pajak,omitempty"`
 	Total           string      `json:"total,omitempty"`
+	SubTotalRP      string      `json:"sub_total_rp,omitempty"`
+	PajakRP         string      `json:"pajak_rp,omitempty"`
+	TotalRP         string      `json:"total_rp,omitempty"`
 	CreatedAt       string      `json:"created_at,omitempty"`
 	CreatedBy       string      `json:"created_by,omitempty"`
 	UpdatedAt       string      `json:"updated_at,omitempty"`
@@ -20,6 +23,7 @@ type PurchaseOrder struct {
 	Massage         string      `json:"message,omitempty"`
 	Status          string      `json:"status,omitempty"`
 	Item            []ItemBuyer `json:"item,omitempty"`
+	ItemDeleted     []ItemBuyer `json:"item_deleted,omitempty"`
 
 	Reason string `json:"reason,omitempty"`
 }
@@ -31,6 +35,7 @@ type ItemBuyer struct {
 	Name     string `json:"name,omitempty"`
 	Quantity string `json:"quantity,omitempty"`
 	Price    string `json:"price,omitempty"`
+	PriceRP  string `json:"price_rp,omitempty"`
 	Discount string `json:"discount,omitempty"`
 	Amount   string `json:"amount,omitempty"`
 }

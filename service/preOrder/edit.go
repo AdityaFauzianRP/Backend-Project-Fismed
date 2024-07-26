@@ -14,30 +14,6 @@ import (
 )
 
 func Edit_Admin(c *gin.Context) {
-	//var input model.PurchaseOrder
-	////var response model.PurchaseOrder
-	//
-	//if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
-	//
-	//	if err := c.Bind(&input); err != nil {
-	//		utility.ResponseError(c, "Input Data Tidak Berhasil !")
-	//	}
-	//
-	//} else {
-	//
-	//	if err := c.BindJSON(&input); err != nil {
-	//		utility.ResponseError(c, "Input Data Tidak Berhasil !")
-	//	}
-	//
-	//}
-	//
-	//log.Println("Data Input :", input)
-
-	//ctx := context.Background()
-	//tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
-	//if err != nil {
-	//	panic(err.Error())
-	//}
 
 	var input model.PurchaseOrder
 	var res model.PurchaseOrder
@@ -59,13 +35,16 @@ func Edit_Admin(c *gin.Context) {
 	log.Println("Data Input :", input)
 
 	res.Item = make([]model.ItemBuyer, len(input.Item))
+	res.Item_deleted = input.Item_deleted
+	res.ID = input.ID
 
 	var Subtotal int
 
 	if len(input.Item) > 0 {
 		for i, item := range input.Item {
 			log.Println("Item Barang Ke :", i)
-
+			res.Item[i].ID = item.ID
+			res.Item[i].POID = item.POID
 			res.Item[i].Name = item.Name
 			res.Item[i].Quantity = item.Quantity
 			res.Item[i].Price = "Rp. " + utility.FormatRupiah(item.Price)
@@ -235,4 +214,145 @@ func Edit_Finance(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{"message": "Data Edit Success !", "status": true})
 	}
+}
+
+func Posting_Edit_admin(c *gin.Context) {
+	var input model.PurchaseOrder
+	//var res model.PurchaseOrder
+
+	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
+
+		if err := c.Bind(&input); err != nil {
+			utility.ResponseError(c, "Input Data Tidak Berhasil !")
+		}
+
+	} else {
+
+		if err := c.BindJSON(&input); err != nil {
+			utility.ResponseError(c, "Input Data Tidak Berhasil !")
+		}
+
+	}
+
+	log.Println("Data Input :", input)
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+	defer tx.Rollback(ctx)
+
+	query := `
+		UPDATE public.purchase_order
+		SET 
+		    nama_suplier=$1, 
+		    nomor_po=$2, 
+		    tanggal=$3, 
+		    catatan_po=$4, 
+		    prepared_by=$5, 
+		    prepared_jabatan=$6, 
+		    approved_by=$7, 
+		    approved_jabatan=$8, 
+		    status='DIPROSES',
+		    updated_at=now(), 
+		    updated_by=$9, 
+		    sub_total=$10, 
+		    pajak=$11, 
+		    total=$12, 
+		    reason=''
+		WHERE id=$13
+	`
+
+	_, err = tx.Exec(ctx, query,
+		input.NamaSuplier,
+		input.NomorPO,
+		input.Tanggal,
+		input.CatatanPO,
+		input.PreparedBy,
+		input.PreparedJabatan,
+		input.ApprovedBy,
+		input.ApprovedJabatan,
+		utility.FormatTanggal1(time.Now()), // Ensure this function returns a suitable format
+		input.SubTotal,
+		input.Pajak,
+		input.Total,
+		input.ID,
+	)
+
+	if err != nil {
+		utility.ResponseError(c, "Error Qeury Update On Table PO")
+		return
+	}
+
+	if len(input.Item) > 0 {
+		for _, item := range input.Item {
+			if item.ID == 0 {
+				QueryItem := `
+				INSERT INTO item_buyer (
+					po_id, 
+					name, 
+					quantity, 
+					price, 
+					discount, 
+					amount
+				) VALUES ($1, $2, $3, $4, $5, $6)`
+
+				_, err = tx.Exec(context.Background(), QueryItem, input.ID, item.Name, item.Quantity, item.Price, item.Discount, item.Amount)
+				if err != nil {
+					tx.Rollback(ctx)
+					utility.ResponseError(c, "Error on Add New Item")
+					return
+				}
+
+				log.Println("Data Item Baru : ", item.Name, " Berhasil di Input!")
+			} else {
+				queryUpdateItem := `
+					UPDATE public.item_buyer
+					SET 
+						name=$1, 
+						quantity=$2, 
+						price=$3, 
+						discount=$4, 
+						amount=$5
+					WHERE id=$6
+				`
+
+				_, err = tx.Exec(ctx, queryUpdateItem,
+					item.Name,
+					item.Quantity,
+					item.Price,
+					item.Discount,
+					item.Amount,
+					item.ID,
+				)
+
+				if err != nil {
+					utility.ResponseError(c, "Error Qeury Update On Table ITEM on Condition Update")
+					return
+				}
+			}
+		}
+	}
+
+	if len(input.Item_deleted) > 0 {
+		for _, hapus := range input.Item_deleted {
+			if hapus.ID != 0 {
+				queryDeleter := "DELETE FROM item_buyer WHERE id = $1"
+				_, err = tx.Exec(ctx, queryDeleter, hapus.ID)
+
+				if err != nil {
+					utility.ResponseError(c, "Error Query Delete Item By Id")
+					return
+				}
+			}
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		utility.ResponseError(c, "Error Commit Transaction Database!")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data Update successfully", "status": true})
 }

@@ -52,6 +52,8 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/purchase-order/edit/finance", logMiddleware(preOrder.Edit_Finance))
 	router.POST("/api/purchase-order/edit/inquiry", logMiddleware(preOrder.Edit_Admin))
 	router.POST("/api/purchase-order/edit/posting", logMiddleware(preOrder.Edit_Finance))
+	router.POST("/api/purchase-order/edit/delete-item-buyer", logMiddleware(preOrder.DeleteItemBuyer))
+	router.POST("/api/purchase-order/edit/posting-edit-admin", logMiddleware(preOrder.Posting_Edit_admin))
 
 	// Sales Order API
 	router.POST("/api/sales_order/list", logMiddleware(salesOrder.ListDaftar_PO))
