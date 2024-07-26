@@ -49,7 +49,8 @@ func Detail(c *gin.Context) {
 			COALESCE(status, '') AS status,
 			COALESCE(sub_total, '') AS sub_total,
 			COALESCE(pajak, '') AS pajak,
-			COALESCE(total, '') AS total
+			COALESCE(total, '') AS total,
+			COALESCE(reason, '') AS reason
 		FROM purchase_order WHERE id = $1 order by id asc;
 	`
 
@@ -77,6 +78,7 @@ func Detail(c *gin.Context) {
 			&res.SubTotal,
 			&res.Pajak,
 			&res.Total,
+			&res.Reason,
 		); err != nil {
 			tx.Rollback(ctx)
 			utility.ResponseError(c, constanta.ErrScan1)
