@@ -33,6 +33,7 @@ type PerformanceInvoice struct {
 	CreatedBy     string `json:"created_by,omitempty"`
 	UpdateAt      string `json:"update_at,omitempty"`
 	UpdatedBy     string `json:"updated_by,omitempty"`
+	NamaCompany   string `json:"nama_company,omitempty"`
 }
 
 type ReqInquiryPI struct {

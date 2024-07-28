@@ -79,6 +79,8 @@ func Inquiry(c *gin.Context) {
 	pajak := Subtotal * 11 / 100
 	total := pajak + Subtotal
 
+	response.TanggalTindakan = input.TanggalTindakan
+
 	response.SubTotal = strconv.Itoa(Subtotal)
 	response.PajakPPN = strconv.Itoa(pajak)
 	response.Total = strconv.Itoa(total)
@@ -93,6 +95,8 @@ func Inquiry(c *gin.Context) {
 	response.NomorPO = "PO/" + utility.GenerateTigaNomor() + "/" + utility.GenerateNomorPO()
 	response.NomorInvoice = "PI/" + utility.GenerateTigaNomor() + "/" + utility.GenerateNomorInvoice()
 	response.NomorSI = "SI/" + utility.GenerateTigaNomor() + "/" + utility.GenerateNomorInvoice()
+	response.NamaPasien = input.NamaPasien
+	response.NamaDokter = input.NamaDokter
 
 	if input.IdDivisi == "1" {
 		response.NamaPasien = ""
@@ -106,13 +110,7 @@ func Inquiry(c *gin.Context) {
 		response.TanggalTindakan = input.TanggalTindakan
 	}
 
-	ExpireDate, err := strconv.Atoi(input.JatuhTempo)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid Jatuh tempo Format format"})
-		return
-	}
-
-	response.JatuhTempo = time.Now().AddDate(0, 0, ExpireDate).Format("2006-01-02")
+	response.JatuhTempo = input.JatuhTempo
 
 	// Return response
 
