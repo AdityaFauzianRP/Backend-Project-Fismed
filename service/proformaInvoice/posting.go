@@ -2,12 +2,12 @@ package proformaInvoice
 
 import (
 	"backend_project_fismed/model"
+	"backend_project_fismed/utility"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
-	"time"
 )
 
 func Posting(c *gin.Context) {
@@ -39,24 +39,44 @@ func Posting(c *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	if input.IdDivisi == "1" {
+	var idCustomer int
+
+	QueryCekRS := `
+		select COALESCE(id, 0) AS id from customer where nama_company = $1
+	`
+	err = tx.QueryRow(ctx, QueryCekRS, input.RumahSakit).Scan(&idCustomer)
+
+	if err != nil {
+		log.Println("[--->]", "Error Get id Perusahaan :", err)
+		tx.Rollback(ctx)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	if idCustomer == 0 {
+		utility.ResponseError(c, "Perusahaan Tidak Ditemukan")
+		return
+	} else {
+		log.Println("Perusahaan Tersedia, Proses di lanjut !")
+	}
+
+	if input.IdDivisi == "Ortopedi" {
 		log.Println("[--->]", "Proses Input Ortopedi!")
 		QeuryInputPI := `
-			insert into performance_invoice (
-			   customer_id, sub_total, 
-			   status, divisi, invoice_number, po_number, due_date, 
-			   created_at, created_by, update_at, updated_by, total, pajak, number_si
-			) VALUES (
-			$1, $2, 'Diproses', 'Ortopedi', $3, $4, $5, $6, 'sales', $7, 'sales', $8, $9, $10 
-			)
+			INSERT INTO performance_invoice (divisi, customer_id, invoice_number, number_si, tanggal_tindakan, due_date, total, sub_total, pajak, created_at , created_by , update_at , updated_by, doctor_name , patient_name , status )
+			VALUES 
+			    (
+			        
+			     $1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), 'SALES', NOW(), 'SALES', $10 , $11 , 'Diproses'
+			        
+			     )
 			RETURNING id
 		`
 
-		err = tx.QueryRow(ctx, QeuryInputPI, input.IdRumahSakit, input.SubTotalRP, input.NomorInvoice,
-			input.NomorPO, input.JatuhTempo, time.Now(), time.Now(), input.TotalRP, input.PajakPPNRP, input.NomorSI).Scan(&newID)
+		err = tx.QueryRow(ctx, QeuryInputPI, input.IdDivisi, idCustomer, input.NomorInvoice, input.NomorSI, input.TanggalTindakan, input.JatuhTempo, input.TotalRP, input.SubTotalRP, input.PajakPPNRP, input.NamaDokter, input.NamaPasien).Scan(&newID)
 
 		if err != nil {
-			log.Println("[--->]", "Error Query Input PI :", err)
+			log.Println("[--->]", "Error Query Input PI Ortopedi:", err)
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
@@ -103,27 +123,23 @@ func Posting(c *gin.Context) {
 				}
 			}
 		}
-	} else if input.IdDivisi == "2" {
+	} else if input.IdDivisi == "Radiologi" {
 		log.Println("[--->]", "Proses Input Radiologi!")
 		QeuryInputPI := `
-			insert into performance_invoice (
-			   	customer_id, sub_total, 
-			   	status, divisi, invoice_number, po_number, due_date, 
-			   	created_at, created_by, update_at, updated_by, total, pajak, 
-			   	doctor_name, patient_name, number_si,
-			   	tanggal_tindakan, rm
-			) VALUES (
-			$1, $2, 'Diproses', 'Ortopedi', $3, $4, $5, NOW(), 'sales', NOW(), 'sales', $6, $7, $8, $9, $10, $11, $12  
-			)
+			INSERT INTO performance_invoice (divisi, customer_id, invoice_number, number_si, due_date, total, sub_total, pajak, created_at , created_by , update_at , updated_by, status  )
+			VALUES 
+			    (
+			        
+			     $1, $2, $3, $4, $5, $6, $7, $8, NOW(), 'SALES', NOW(), 'SALES', 'Diproses'
+			        
+			     )
 			RETURNING id
 		`
 
-		err = tx.QueryRow(ctx, QeuryInputPI, input.IdRumahSakit, input.SubTotalRP, input.NomorInvoice,
-			input.NomorPO, input.JatuhTempo, input.TotalRP, input.PajakPPNRP,
-			input.NamaDokter, input.NamaPasien, input.NomorSI, input.TanggalTindakan, input.RM).Scan(&newID)
+		err = tx.QueryRow(ctx, QeuryInputPI, input.IdDivisi, idCustomer, input.NomorInvoice, input.NomorSI, input.JatuhTempo, input.TotalRP, input.SubTotalRP, input.PajakPPNRP).Scan(&newID)
 
 		if err != nil {
-			log.Println("[--->]", "Error Query Input PI :", err)
+			log.Println("[--->]", "Error Query Input PI Ortopedi:", err)
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
