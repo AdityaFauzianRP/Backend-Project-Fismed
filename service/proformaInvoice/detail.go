@@ -37,25 +37,26 @@ func DetailPI(c *gin.Context) {
 
 	queryDetailPI := `
 		SELECT 
-			COALESCE(id, 0) AS id,
-			COALESCE(customer_id, 0) AS customer_id,
-			COALESCE(sub_total, '') AS sub_total,
-			COALESCE(status, '') AS status,
-			COALESCE(divisi, '') AS divisi,
-			COALESCE(invoice_number, '') AS invoice_number,
-			COALESCE(po_number, '') AS po_number,
-			COALESCE(due_date , '') AS due_date,
-			COALESCE(doctor_name, '') AS doctor_name,
-			COALESCE(patient_name, '') AS patient_name,
-			COALESCE(pajak, '') AS pajak,
-			COALESCE(total, '') AS total,
-			COALESCE(tanggal_tindakan, '') AS tanggal_tindakan,
-			COALESCE(rm, '') AS rm,
-			COALESCE(number_si, '') AS number_si,
-			COALESCE(reason, '') AS reason
+			COALESCE(a.id, 0) AS id,
+			COALESCE(a.customer_id, 0) AS customer_id,
+			COALESCE(a.sub_total, '') AS sub_total,
+			COALESCE(a.status, '') AS status,
+			COALESCE(a.divisi, '') AS divisi,
+			COALESCE(a.invoice_number, '') AS invoice_number,
+			COALESCE(a.po_number, '') AS po_number,
+			COALESCE(a.due_date , '') AS due_date,
+			COALESCE(a.doctor_name, '') AS doctor_name,
+			COALESCE(a.patient_name, '') AS patient_name,
+			COALESCE(a.pajak, '') AS pajak,
+			COALESCE(a.total, '') AS total,
+			COALESCE(a.tanggal_tindakan, '') AS tanggal_tindakan,
+			COALESCE(a.rm, '') AS rm,
+			COALESCE(a.number_si, '') AS number_si,
+			COALESCE(a.reason, '') AS reason,
+			COALESCE(c.nama_company, '') AS nama_company,
+			COALESCE(c.address_company , '') AS address_company
 		FROM 
-			performance_invoice
-		where id = $1
+			performance_invoice a, customer c where a.customer_id = c.id and a.id = $1
 	`
 
 	rows, err := tx.Query(ctx, queryDetailPI, input.ID)
@@ -90,6 +91,8 @@ func DetailPI(c *gin.Context) {
 			&invoice.RM,
 			&invoice.NumberSI,
 			&invoice.Reason,
+			&invoice.Customer,
+			&invoice.AlamaCustomer,
 		)
 
 		if err != nil {
