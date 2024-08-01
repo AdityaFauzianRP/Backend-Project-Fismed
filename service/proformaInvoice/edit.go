@@ -140,7 +140,9 @@ func PostingEdit_PI(c *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	if input.Divisi == "Ortopedi" {
+	input.Status = "Diproses"
+
+	if input.Divisi == "Radiologi" {
 		query := `
 			UPDATE performance_invoice
 			SET
@@ -155,14 +157,15 @@ func PostingEdit_PI(c *gin.Context) {
 				total = $9,
 				number_si = $10,
 				update_at = now(),
-				updated_by = 'sales'
-			WHERE id = $11;
+				updated_by = 'sales',
+				reason = $11
+			WHERE id = $12;
 			`
 
 		_, err = tx.Exec(context.Background(), query,
 			input.CustomerID,
 			input.SubTotalRP,
-			input.Status,
+			"Diproses",
 			input.Divisi,
 			input.InvoiceNumber,
 			input.PONumber,
@@ -170,10 +173,13 @@ func PostingEdit_PI(c *gin.Context) {
 			input.PajakPPNRP,
 			input.TotalRP,
 			input.NumberSI,
+			"",
 			input.ID,
 		)
 
-	} else if input.Divisi == "Radiologi" {
+		log.Println("Edit Radiologi")
+
+	} else if input.Divisi == "Ortopedi" {
 		query := `
 			UPDATE performance_invoice
 			SET
@@ -192,8 +198,9 @@ func PostingEdit_PI(c *gin.Context) {
 				rm = $13,
 				number_si = $14,
 				update_at = now(),
-				updated_by = 'sales'
-			WHERE id = $15;
+				updated_by = 'sales',
+				reason = $15
+			WHERE id = $16;
 			`
 
 		_, err = tx.Exec(context.Background(), query,
@@ -211,8 +218,11 @@ func PostingEdit_PI(c *gin.Context) {
 			input.TanggalTindakan,
 			input.RM,
 			input.NumberSI,
+			"",
 			input.ID,
 		)
+
+		log.Println("Edit Ortopedi")
 
 	}
 
