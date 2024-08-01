@@ -235,6 +235,8 @@ func PostingEdit_PI(c *gin.Context) {
 	if len(input.ItemDetailPI) > 0 {
 		for _, detail := range input.ItemDetailPI {
 			if detail.Id == 0 {
+				log.Println("Barang Di Tambah ! : ", detail.Id)
+
 				QueryItem := `
 					insert into order_items (
 						pi_id, "name", quantity, price, discount, 
@@ -253,8 +255,10 @@ func PostingEdit_PI(c *gin.Context) {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 					return
 				}
-			} else {
-				query := `
+			} else if detail.Id > 0 {
+				log.Println("Barang Di Edit ! : ", detail.Id)
+
+				queryUPDATE := `
 				UPDATE order_items
 				SET
 					name = $1,
@@ -268,7 +272,7 @@ func PostingEdit_PI(c *gin.Context) {
 				WHERE id = $9;
 				`
 
-				_, err = tx.Exec(context.Background(), query,
+				_, err = tx.Exec(ctx, queryUPDATE,
 					detail.NamaBarang,
 					detail.Quantity,
 					detail.HargaSatuan,
@@ -277,19 +281,21 @@ func PostingEdit_PI(c *gin.Context) {
 					detail.Kat,
 					time.Now(),
 					"sales",
-					input.ID,
+					detail.Id,
 				)
 
 				if err != nil {
-					tx.Rollback(ctx)
-					c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
-					return
+					err := tx.Rollback(ctx)
+					if err != nil {
+						c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+						return
+					}
 				}
 			}
 		}
 	}
 
-	//  Ketika Berhasik Pengaruhi jumlah Stok
+	//  Ketika Berhasil Pengaruhi jumlah Stok
 
 	if err := tx.Commit(ctx); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
