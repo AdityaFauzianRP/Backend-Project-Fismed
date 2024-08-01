@@ -101,6 +101,11 @@ func EditPI(c *gin.Context) {
 	response.TotalRP = "Rp. " + utility.FormatRupiah(response.Total)
 	response.PajakPPNRP = "Rp. " + utility.FormatRupiah(response.Pajak)
 	response.SubTotalRP = "Rp. " + utility.FormatRupiah(response.SubTotal)
+	response.AlamaCustomer = input.AlamaCustomer
+	response.Customer = input.Customer
+
+	now := time.Time{}
+	response.Tanggal = utility.FormatTanggal1(now)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Inquiry Performa Invoice Success !", "data": response, "status": true})
 }

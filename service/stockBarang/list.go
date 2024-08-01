@@ -5,6 +5,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
+	"log"
 	"net/http"
 )
 
@@ -18,7 +19,7 @@ func List(c *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	query := "SELECT id, name, total, price, created_at, created_by, updated_at, updated_by FROM public.stock_items;"
+	query := "SELECT id, name, total, price, created_at, created_by, updated_at, updated_by, katalog, gudang FROM public.stock_items;"
 
 	rows, err := tx.Query(ctx, query)
 	if err != nil {
@@ -27,6 +28,8 @@ func List(c *gin.Context) {
 		return
 	}
 	defer rows.Close()
+
+	log.Println("rows", rows)
 
 	var Responses []model.StockBarang
 	for rows.Next() {
@@ -40,9 +43,11 @@ func List(c *gin.Context) {
 			&res.CreatedBy,
 			&res.UpdatedAt,
 			&res.UpdatedBy,
+			&res.Katalog,
+			&res.Gudang,
 		); err != nil {
 			tx.Rollback(ctx)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Stock Barang", "status": false})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Stock Barang  123", "status": false})
 			return
 		}
 		Responses = append(Responses, res)
