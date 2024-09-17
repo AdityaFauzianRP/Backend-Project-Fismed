@@ -25,6 +25,8 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/customer-profilling/add", logMiddleware(customerProfilling.Add))
 	router.POST("/api/customer-profilling/get-tax-code", logMiddleware(customerProfilling.GetTaxCode))
 	router.POST("/api/customer-profilling/get-by-search", logMiddleware(customerProfilling.GetBySearch))
+	router.POST("/api/proforma-invoice/rs-list", logMiddleware(customerProfilling.RumahSakitList))
+	router.POST("/api/proforma-invoice/sp-list", logMiddleware(customerProfilling.SupplierList))
 
 	// Pro forma Invoice API
 	router.POST("/api/proforma-invoice/get-all-list", logMiddleware(proformaInvoice.GetAllList))
@@ -35,7 +37,6 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/proforma-invoice/editPI-posting", logMiddleware(proformaInvoice.PostingEdit_PI))
 	router.POST("/api/proforma-invoice/editPI-admin", logMiddleware(proformaInvoice.EditAdmin))
 	router.POST("/api/proforma-invoice/divisi-list", logMiddleware(proformaInvoice.DivisiList))
-	router.POST("/api/proforma-invoice/rs-list", logMiddleware(proformaInvoice.RumahSakitList))
 
 	// Stock Barang API
 	router.POST("/api/stock-barang/add", logMiddleware(stockBarang.Add))

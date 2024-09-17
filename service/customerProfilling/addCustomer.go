@@ -1,16 +1,20 @@
 package customerProfilling
 
 import (
+	"backend_project_fismed/constanta"
 	"backend_project_fismed/model"
+	"backend_project_fismed/utility"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
+	"log"
 	"net/http"
+	"time"
 )
 
 func Add(c *gin.Context) {
 
-	var input model.Customer
+	var input model.CustomerNew
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
@@ -33,55 +37,236 @@ func Add(c *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	if input.Name != "" {
-		query := `INSERT INTO customer (
-			nama_company, address_company, npwp_address, npwp, ipak_number, 
-			facture_address, city_facture, zip_code_facture, number_phone_facture, email_facture, fax_facture, pic_facture,
-			item_address, city_item, zip_code_item, number_phone_item, email_item, fax_item, pic_item,
-			contact_person, tax_code_id, top,
-			created_at, created_by, updated_at, updated_by, handphone, nama, kategori
-		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW(), 'admin', NOW(), 'admin', $23, $24, 'RS'
-		)`
+	input.NamaDokter = utility.ToUpperCase(input.NamaDokter, "0")
+	input.NamaPerusahaan = utility.ToUpperCase(input.NamaPerusahaan, input.KategoriDivisi)
 
+	if input.KategoriDivisi == constanta.CustomerRS {
+
+		log.Println("Customer Rumah Sakit !")
+
+		query := `
+			INSERT INTO customer (
+				nama_perusahaan,
+				address_perusahaan,
+				npwp_address_perusahaan,
+				npwp_perusahaan,
+				ipak_number_perusahaan,
+				alamat_pengirim_facture_perusahaan,
+				kota_perusahaan,
+				kode_pos_perusahaan,
+				telpon_perusahaan,
+				email_perusahaan,
+				nama_dokter,
+				alamat_pengirim_dokter,
+				npwp_dokter,
+				telpon_dokter,
+				email_dokter,
+				pic_dokter,
+				kota_dokter,
+				kode_pos_dokter,
+				handphone_dokter,
+				kode_pajak_dokter,
+				cp_dokter,
+				verifikasi_dokter,
+				created_at,
+				created_by,
+				updated_at,
+				updated_by,
+				pembuat_cp_dokter,
+				term_of_payment,
+				kategori_divisi
+			) VALUES (
+				$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29
+			)`
+
+		// Data yang akan diinsert
 		_, err = tx.Exec(ctx, query,
-			input.NameCompany, input.AddressCompany, input.NPWPAddress, input.NPWP, input.IpakNumber,
-			input.FactureAddress, input.CityFacture, input.ZipCodeFacture, input.NumberPhoneFacture, input.EmailFacture, input.FaxFacture, input.PicFacture,
-			input.ItemAddress, input.CityItem, input.ZipCodeItem, input.NumberPhoneItem, input.EmailItem, input.FaxItem, input.PicItem,
-			input.ContactPerson, input.TaxCodeID, input.Top, input.Handphone, input.Name)
+			input.NamaPerusahaan,
+			input.AddressPerusahaan,
+			input.NPWPAddressPerusahaan,
+			input.NPWPPerusahaan,
+			input.IPAKNumberPerusahaan,
+			input.AlamatPengirimFacturePerusahaan,
+			input.KotaPerusahaan,
+			input.KodePosPerusahaan,
+			input.TelponPerusahaan,
+			input.EmailPerusahaan,
+			input.NamaDokter,
+			input.AlamatPengirimDokter,
+			input.NPWPDokter,
+			input.TelponDokter,
+			input.EmailDokter,
+			input.PICDokter,
+			input.KotaDokter,
+			input.KodePosDokter,
+			input.HandphoneDokter,
+			input.KodePajakDokter,
+			input.CPDokter,
+			input.VerifikasiDokter,
+			time.Now(),
+			"admin",
+			time.Now(),
+			"admin",
+			input.PembuatCPDokter,
+			input.TermOfPayment,
+			input.KategoriDivisi,
+		)
 
-		if err != nil {
-			tx.Rollback(ctx)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
-			return
-		}
-	} else {
-		query := `INSERT INTO customer (
-			nama_company, address_company, npwp_address, npwp, ipak_number, 
-			facture_address, city_facture, zip_code_facture, number_phone_facture, email_facture, fax_facture, pic_facture,
-			item_address, city_item, zip_code_item, number_phone_item, email_item, fax_item, pic_item,
-			contact_person, tax_code_id, top,
-			created_at, created_by, updated_at, updated_by, handphone, kategori
-		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW(), 'admin', NOW(), 'admin', $23,'SP'
-		)`
+	} else if input.KategoriDivisi == constanta.CustomerNonRS {
 
+		log.Println("Customer Non Rumah Sakit ! ")
+
+		query := `
+			INSERT INTO customer (
+				nama_perusahaan,
+				address_perusahaan,
+				npwp_address_perusahaan,
+				npwp_perusahaan,
+				ipak_number_perusahaan,
+				alamat_pengirim_facture_perusahaan,
+				kota_perusahaan,
+				kode_pos_perusahaan,
+				telpon_perusahaan,
+				email_perusahaan,
+				nama_dokter,
+				alamat_pengirim_dokter,
+				npwp_dokter,
+				telpon_dokter,
+				email_dokter,
+				pic_dokter,
+				kota_dokter,
+				kode_pos_dokter,
+				handphone_dokter,
+				kode_pajak_dokter,
+				cp_dokter,
+				verifikasi_dokter,
+				created_at,
+				created_by,
+				updated_at,
+				updated_by,
+				pembuat_cp_dokter,
+				term_of_payment,
+				kategori_divisi
+			) VALUES (
+				$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29
+			)`
+
+		// Data yang akan diinsert
 		_, err = tx.Exec(ctx, query,
-			input.NameCompany, input.AddressCompany, input.NPWPAddress, input.NPWP, input.IpakNumber,
-			input.FactureAddress, input.CityFacture, input.ZipCodeFacture, input.NumberPhoneFacture, input.EmailFacture, input.FaxFacture, input.PicFacture,
-			input.ItemAddress, input.CityItem, input.ZipCodeItem, input.NumberPhoneItem, input.EmailItem, input.FaxItem, input.PicItem,
-			input.ContactPerson, input.TaxCodeID, input.Top, input.Handphone)
+			input.NamaPerusahaan,
+			input.AddressPerusahaan,
+			input.NPWPAddressPerusahaan,
+			input.NPWPPerusahaan,
+			input.IPAKNumberPerusahaan,
+			input.AlamatPengirimFacturePerusahaan,
+			input.KotaPerusahaan,
+			input.KodePosPerusahaan,
+			input.TelponPerusahaan,
+			input.EmailPerusahaan,
+			input.NamaDokter,
+			input.AlamatPengirimDokter,
+			input.NPWPDokter,
+			input.TelponDokter,
+			input.EmailDokter,
+			input.PICDokter,
+			input.KotaDokter,
+			input.KodePosDokter,
+			input.HandphoneDokter,
+			input.KodePajakDokter,
+			input.CPDokter,
+			input.VerifikasiDokter,
+			time.Now(),
+			"admin",
+			time.Now(),
+			"admin",
+			input.PembuatCPDokter,
+			input.TermOfPayment,
+			input.KategoriDivisi,
+		)
 
-		if err != nil {
-			tx.Rollback(ctx)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
-			return
-		}
+	} else if input.KategoriDivisi == constanta.CustomerAsSupplier {
+
+		log.Println("Customer As Supplier ! ")
+
+		query := `
+			INSERT INTO customer (
+				nama_perusahaan,
+				address_perusahaan,
+				npwp_address_perusahaan,
+				npwp_perusahaan,
+				ipak_number_perusahaan,
+				alamat_pengirim_facture_perusahaan,
+				kota_perusahaan,
+				kode_pos_perusahaan,
+				telpon_perusahaan,
+				email_perusahaan,
+				nama_dokter,
+				alamat_pengirim_dokter,
+				npwp_dokter,
+				telpon_dokter,
+				email_dokter,
+				pic_dokter,
+				kota_dokter,
+				kode_pos_dokter,
+				handphone_dokter,
+				kode_pajak_dokter,
+				cp_dokter,
+				verifikasi_dokter,
+				created_at,
+				created_by,
+				updated_at,
+				updated_by,
+				pembuat_cp_dokter,
+				term_of_payment,
+				kategori_divisi
+			) VALUES (
+				$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29
+			)`
+
+		// Data yang akan diinsert
+		_, err = tx.Exec(ctx, query,
+			input.NamaPerusahaan,
+			input.AddressPerusahaan,
+			input.NPWPAddressPerusahaan,
+			input.NPWPPerusahaan,
+			input.IPAKNumberPerusahaan,
+			input.AlamatPengirimFacturePerusahaan,
+			input.KotaPerusahaan,
+			input.KodePosPerusahaan,
+			input.TelponPerusahaan,
+			input.EmailPerusahaan,
+			input.NamaDokter,
+			input.AlamatPengirimDokter,
+			input.NPWPDokter,
+			input.TelponDokter,
+			input.EmailDokter,
+			input.PICDokter,
+			input.KotaDokter,
+			input.KodePosDokter,
+			input.HandphoneDokter,
+			input.KodePajakDokter,
+			input.CPDokter,
+			input.VerifikasiDokter,
+			time.Now(),
+			"admin",
+			time.Now(),
+			"admin",
+			input.PembuatCPDokter,
+			input.TermOfPayment,
+			input.KategoriDivisi,
+		)
+
+	}
+
+	if err != nil {
+		tx.Rollback(ctx)
+		log.Println("Insert failed:", err)
+		c.JSON(400, gin.H{"message": err})
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
-		return
+		log.Println("Failed to commit transaction:", err)
+		c.JSON(400, gin.H{"message": err})
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Customer added successfully", "status": true})

@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"backend_project_fismed/constanta"
 	"context"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -31,6 +32,29 @@ func TanggalSekarang() time.Time {
 	// Mengambil waktu saat ini di zona waktu Asia/Jakarta
 	now := time.Now().In(location)
 	return now
+}
+
+func ToUpperCase(namaPerusahaan string, divisi string) string {
+	if divisi == constanta.CustomerRS {
+		log.Println("Rumah Sakit !")
+
+	} else if divisi == constanta.CustomerNonRS {
+
+		log.Println("Non Rumah Sakit")
+
+		namaPerusahaan = "PT. " + namaPerusahaan
+
+	} else if divisi == constanta.CustomerAsSupplier {
+
+		log.Println("Supplier ")
+
+		namaPerusahaan = "PT. " + namaPerusahaan
+
+	} else {
+		log.Println("Selain Rumah Sakit !")
+
+	}
+	return strings.ToUpper(namaPerusahaan)
 }
 
 // FormatTanggal1 mengembalikan tanggal dalam format tttt - bb - hh
