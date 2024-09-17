@@ -25,4 +25,8 @@ const (
 	Diterima string = "DITERIMA"
 	Ditolak  string = "DIPROSES"
 	Diproses string = "DITOLAK"
+
+	CustomerRS         string = "1"
+	CustomerNonRS      string = "2"
+	CustomerAsSupplier string = "3"
 )
