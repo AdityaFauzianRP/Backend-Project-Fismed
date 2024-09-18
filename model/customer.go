@@ -34,3 +34,7 @@ type CustomerNew struct {
 	TermOfPayment                   string    `json:"term_of_payment"`
 	KategoriDivisi                  string    `json:"kategori_divisi"`
 }
+
+type DocktorName struct {
+	Nama string `json:"namaDokter"`
+}

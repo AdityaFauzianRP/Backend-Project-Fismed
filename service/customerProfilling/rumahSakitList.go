@@ -24,7 +24,7 @@ func RumahSakitList(c *gin.Context) {
 			id, 
 			COALESCE(nama_perusahaan, 'default_name') AS name, 
 			COALESCE(address_perusahaan, 'default_address') AS address_company
-		FROM customer where kategori_divisi = '1'
+		FROM customer
 		ORDER BY nama_perusahaan, id ASC;
 		`
 
