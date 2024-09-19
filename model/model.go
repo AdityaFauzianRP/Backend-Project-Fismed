@@ -118,6 +118,7 @@ type Customer struct {
 	TaxCodeID          string `json:"tax_code_id,omitempty"`
 	Top                string `json:"top,omitempty"`
 	Handphone          string `json:"handphone,omitempty"`
+	DocktorName        string `json:"docktor_name"`
 }
 
 type PerformanceInvoiceDetail struct {

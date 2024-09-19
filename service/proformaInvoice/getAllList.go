@@ -32,7 +32,7 @@ func GetAllList(c *gin.Context) {
 			COALESCE(a.created_by, '') AS created_by, TO_CHAR(
 			COALESCE(a.update_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS update_at, 
 			COALESCE(a.updated_by, '') AS updated_by ,
-			C.nama_company 
+			C.nama_perusahaan  
 		from performance_invoice a, customer c where A.customer_id = C.id  ORDER BY id;
 
 	`
