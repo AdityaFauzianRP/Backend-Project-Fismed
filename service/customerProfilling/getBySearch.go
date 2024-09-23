@@ -3,12 +3,10 @@ package customerProfilling
 import (
 	"backend_project_fismed/model"
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 func GetBySearch(c *gin.Context) {
@@ -41,31 +39,30 @@ func GetBySearch(c *gin.Context) {
 	query := `
 		SELECT 
 			id,
-			COALESCE(nama_company, '') AS nama_company,
-			COALESCE(address_company, '') AS address_company,
-			COALESCE(npwp_address, '') AS npwp_address,
-			COALESCE(npwp, '') AS npwp,
-			COALESCE(ipak_number, '') AS ipak_number,
-			COALESCE(facture_address, '') AS facture_address,
-			COALESCE(city_facture, '') AS city_facture,
-			COALESCE(zip_code_facture, '') AS zip_code_facture,
-			COALESCE(number_phone_facture, '') AS number_phone_facture,
-			COALESCE(email_facture, '') AS email_facture,
-			COALESCE(fax_facture, '') AS fax_facture,
-			COALESCE(pic_facture, '') AS pic_facture,
-			COALESCE(item_address, '') AS item_address,
-			COALESCE(city_item, '') AS city_item,
-			COALESCE(zip_code_item, '') AS zip_code_item,
-			COALESCE(number_phone_item, '') AS number_phone_item,
-			COALESCE(email_item, '') AS email_item,
-			COALESCE(fax_item, '') AS fax_item,
-			COALESCE(pic_item, '') AS pic_item,
-			COALESCE(contact_person, '') AS contact_person,
-			COALESCE(CAST(tax_code_id AS TEXT), '0') AS tax_code_id,  -- Assuming tax_code_id is an integer. Adjust the default value as needed.
-			COALESCE(top, '') AS top
+			COALESCE(nama_perusahaan, '') AS nama_company,
+			COALESCE(address_perusahaan, '') AS address_company,
+			COALESCE(npwp_address_perusahaan , '') AS npwp_address,
+			COALESCE(npwp_perusahaan , '') AS npwp,
+			COALESCE(ipak_number_perusahaan , '') AS ipak_number,
+			COALESCE(alamat_pengirim_facture_perusahaan , '') AS facture_address,
+			COALESCE(kota_perusahaan , '') AS city_facture,
+			COALESCE(kode_pos_perusahaan , '') AS zip_code_facture,
+			COALESCE(telpon_perusahaan , '') AS number_phone_facture,
+			COALESCE(email_perusahaan , '') AS email_facture,
+			COALESCE(pic_perusahaan , '') AS pic_facture,
+			COALESCE(alamat_pengirim_dokter , '') AS item_address,
+			COALESCE(kota_dokter , '') AS city_item,
+			COALESCE(kode_pos_dokter , '') AS zip_code_item,
+			COALESCE(telpon_dokter , '') AS number_phone_item,
+			COALESCE(email_dokter , '') AS email_item,
+			COALESCE(pic_dokter , '') AS pic_item,
+			COALESCE(cp_dokter , '') AS contact_person,
+			COALESCE(CAST(tax_code  AS TEXT), '0') AS tax_code_id,
+			COALESCE(term_of_payment , '') AS top,
+			coalesce(nama_dokter, '')as nama_dokter 
 		FROM 
 			public.customer
-		where nama_company = $1;
+		where nama_perusahaan = $1;
 	`
 
 	rows, err := tx.Query(ctx, query, input.Name)
@@ -92,18 +89,17 @@ func GetBySearch(c *gin.Context) {
 			&tc.ZipCodeFacture,
 			&tc.NumberPhoneFacture,
 			&tc.EmailFacture,
-			&tc.FaxFacture,
 			&tc.PicFacture,
 			&tc.ItemAddress,
 			&tc.CityItem,
 			&tc.ZipCodeItem,
 			&tc.NumberPhoneItem,
 			&tc.EmailItem,
-			&tc.FaxItem,
 			&tc.PicItem,
 			&tc.ContactPerson,
 			&tc.TaxCodeID,
 			&tc.Top,
+			&tc.DocktorName,
 		); err != nil {
 			log.Println("[--->]", "Error Scan Data :", error(err))
 			tx.Rollback(ctx)
@@ -121,87 +117,31 @@ func GetBySearch(c *gin.Context) {
 
 	var jumlahPI int
 
-	countPI := `
+	// Hitung Jumlah Order PI
+	for _, customer := range response {
+		hitungPI := `
 		SELECT COUNT(*) AS total_invoices
 		FROM performance_invoice
 		WHERE customer_id = $1;
-	`
-
-	err = tx.QueryRow(ctx, countPI, response[0].ID).Scan(&jumlahPI)
-	if err != nil {
-		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
-		return
-	}
-
-	log.Println("[--->]", "Nama Customer :", response[0].ID)
-
-	QueryHistory := `
-		select 
-		    a."name" , 
-		    a.quantity  
-		from 
-		    order_items a, performance_invoice b 
-		where  
-		    b.customer_id = $1 and 
-		    b.id = a.pi_id;
-	`
-
-	rows, err = tx.Query(ctx, QueryHistory, response[0].ID)
-	if err != nil {
-		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
-		return
-	}
-	defer rows.Close()
-
-	var responseRiwayat []model.StockBarang
-
-	for rows.Next() {
-		var tc model.StockBarang
-		if err := rows.Scan(
-			&tc.Name,
-			&tc.Total,
-		); err != nil {
-			log.Println("[--->]", "Error Scan Data :", error(err))
+		`
+		var hitungpi int
+		err := tx.QueryRow(ctx, hitungPI, customer.ID).Scan(&hitungpi)
+		if err != nil {
 			tx.Rollback(ctx)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Data", "status": false})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 			return
 		}
-		responseRiwayat = append(responseRiwayat, tc)
-	}
 
-	log.Println("[--->]", "Data Response Riwayat :", responseRiwayat)
-
-	itemQuantities := make(map[string]int)
-
-	// Iterate over the order items and accumulate the quantities for each item name
-	for _, item := range responseRiwayat {
-		total, err := strconv.Atoi(item.Total)
-		if err != nil {
-			log.Println("[--->]", "Count Data Error :", error(err))
-		}
-		itemQuantities[item.Name] += total
-	}
-
-	// Print the total quantity for each item name
-	for itemName, quantity := range itemQuantities {
-		fmt.Printf("Item: %s, Total Quantity: %d\n", itemName, quantity)
-	}
-
-	var itemTotals []model.StockBarang
-
-	for itemName, quantity := range itemQuantities {
-		itemTotals = append(itemTotals, model.StockBarang{Name: itemName, Total: strconv.Itoa(quantity)})
+		jumlahPI = jumlahPI + hitungpi
 	}
 
 	if len(response) > 0 {
 		c.JSON(http.StatusOK, gin.H{
-			"message":       "Data Ditemukan !",
-			"jumlah_pi":     jumlahPI,
-			"customer":      response,
-			"riwayat_order": itemTotals,
-			"status":        true,
+			"message":   "Data Ditemukan !",
+			"jumlah_pi": jumlahPI,
+			"customer":  response,
+			//"riwayat_order": totalQuantity,
+			"status": true,
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "Data": []model.Customer{}, "status": true})

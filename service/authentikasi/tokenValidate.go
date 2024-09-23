@@ -47,6 +47,10 @@ func TokenValidate(c *gin.Context) {
 	err = tx.QueryRow(ctx, QueryGetByToke, input.Token).Scan(&ID, &USERNAME)
 	if err != nil {
 		log.Println("Error parsing token:", err)
+		c.JSON(400, gin.H{
+			"message": "User tidak valid !",
+			"status":  false,
+		})
 		return
 	}
 

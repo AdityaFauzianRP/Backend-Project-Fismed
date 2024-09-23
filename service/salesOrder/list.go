@@ -12,7 +12,6 @@ import (
 )
 
 func ListDaftar_PO(c *gin.Context) {
-	//	List Daftar PO di ambil dari PI yang di terima
 
 	ctx := context.Background()
 	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
@@ -39,7 +38,7 @@ func ListDaftar_PO(c *gin.Context) {
 			COALESCE(a.rm, '') AS rm,
 			COALESCE(a.number_si, '') AS number_si,
 			a.created_at ,
-			c.nama_company 
+			c.nama_perusahaan 
 		from performance_invoice a, customer c  where status = 'Diterima' and a.customer_id = c.id  order by id asc;
 	`
 
