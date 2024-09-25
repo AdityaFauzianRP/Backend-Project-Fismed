@@ -35,12 +35,13 @@ func ListByGudangId(c *gin.Context) {
 
 	queryList := `
 		select 
-			variable,
-			nama,
-			qty,
-			price,
-			kode
-		from stock where gudang_id = $1
+			a.variable,
+			a.nama,
+			a.qty,
+			a.price,
+			a.kode, 
+			g.nama_gudang
+		from stock a , gudang g where gudang_id = $1 and a.gudang_id  = g.id 
 	`
 
 	row, err := tx.Query(ctx, queryList, input.ID)
@@ -62,6 +63,7 @@ func ListByGudangId(c *gin.Context) {
 			&ambil.Qty,
 			&ambil.Harga,
 			&ambil.Kode,
+			&ambil.NamaGudang,
 		)
 
 		if err != nil {
