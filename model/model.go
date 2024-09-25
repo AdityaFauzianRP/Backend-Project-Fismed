@@ -19,6 +19,7 @@ type RequestID struct {
 	ID     string `json:"id,omitempty"`
 	Divisi string `json:"divisi,omitempty"`
 	Export string `json:"export,omitempty"`
+	Nama   string `json:"nama"`
 }
 
 type PerformanceInvoice struct {

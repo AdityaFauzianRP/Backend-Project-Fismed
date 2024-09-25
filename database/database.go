@@ -7,9 +7,11 @@ import (
 	"backend_project_fismed/service/pengeluaran"
 	"backend_project_fismed/service/piutang"
 	"backend_project_fismed/service/preOrder"
+	price_list "backend_project_fismed/service/price-list"
 	"backend_project_fismed/service/proformaInvoice"
 	"backend_project_fismed/service/salesOrder"
 	"backend_project_fismed/service/stockBarang"
+	"backend_project_fismed/service/stok"
 	"backend_project_fismed/utility"
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -51,6 +53,8 @@ func NewConnect() (*pgxpool.Pool, error) {
 	pemasukan.InitiateDB(db)
 	piutang.InitiateDB(db)
 	pengeluaran.InitiateDB(db)
+	stok.InitiateDB(db)
+	price_list.InitiateDB(db)
 
 	return db, nil
 }
