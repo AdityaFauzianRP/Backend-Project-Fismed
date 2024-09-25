@@ -7,9 +7,11 @@ import (
 	"backend_project_fismed/service/pengeluaran"
 	"backend_project_fismed/service/piutang"
 	"backend_project_fismed/service/preOrder"
+	price_list "backend_project_fismed/service/price-list"
 	"backend_project_fismed/service/proformaInvoice"
 	"backend_project_fismed/service/salesOrder"
 	"backend_project_fismed/service/stockBarang"
+	"backend_project_fismed/service/stok"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +22,16 @@ func Routes(router *gin.Engine) {
 
 	router.POST("/api/login", logMiddleware(authentikasi.Login))
 	router.POST("/api/token-validate", logMiddleware(authentikasi.TokenValidate))
+
+	//  Stok Baru APIL
+	router.POST("/api/stok/listbygudang", logMiddleware(stok.ListByGudangId))
+	router.POST("/api/stok/list-customer", logMiddleware(stok.ListBarang))
+	router.POST("/api/stok/list-proses", logMiddleware(stok.ListBarangProses))
+
+	//  PRICE Baru APIL
+	router.POST("/api/price/list", logMiddleware(price_list.PriceList))
+	router.POST("/api/price/ListByCustomer", logMiddleware(price_list.ListByCustomer))
+	router.POST("/api/price/SetPrice", logMiddleware(price_list.SetPrice))
 
 	// Customer Profilling API
 	router.POST("/api/customer-profilling/add", logMiddleware(customerProfilling.Add))
