@@ -96,58 +96,130 @@ func ListByCustomer(c *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	queryList := `
+	cek := 0
+
+	queryCek := `
+		select count(nama_rumah_sakit)from price_list pl where nama_rumah_sakit = $1;
+	`
+	err = tx.QueryRow(ctx, queryCek, input.Nama).Scan(&cek)
+
+	if cek == 0 {
+		log.Println("Customer Baru, Hargannya blm di set !")
+		queryList := `
+		SELECT 
+			a.variable,
+			a.nama,
+			a.kode
+		FROM stock a
+		GROUP BY 
+			a.variable,
+			a.nama,
+			a.kode
+		ORDER BY a.nama;
+	`
+
+		row, err := tx.Query(ctx, queryList)
+		if err != nil {
+			tx.Rollback(ctx)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+			return
+		}
+
+		defer row.Close()
+
+		var Data []model.Price
+
+		for row.Next() {
+			var ambil model.Price
+			err := row.Scan(
+				&ambil.Variable,
+				&ambil.Nama,
+				&ambil.Kode,
+			)
+
+			if err != nil {
+				tx.Rollback(ctx)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Data", "status": false})
+				return
+			}
+			ambil.NamarumahSakit = input.Nama
+			ambil.Price = "0"
+			ambil.Diskon = 0
+			ambil.Added = "0"
+			Data = append(Data, ambil)
+		}
+
+		if err := row.Err(); err != nil {
+			tx.Rollback(ctx)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error iterating over Stock Barang rows", "status": false})
+			return
+		}
+
+		if len(Data) > 0 {
+			c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "data": Data, "status": true})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []model.StockBarang{}, "status": true})
+		}
+
+	} else {
+		log.Println("Customer Lama, Sudah Set Harga !")
+
+		queryList := `
 		select 
 			nama_rumah_sakit ,
 			kode ,
 			variable ,
 			nama ,
 			price ,
-			diskon
+			diskon ,
+			added
 		from price_list pl where nama_rumah_sakit = $1
 	`
 
-	row, err := tx.Query(ctx, queryList, input.Nama)
-	if err != nil {
-		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
-		return
-	}
-
-	defer row.Close()
-
-	var Data []model.Price
-
-	for row.Next() {
-		var ambil model.Price
-		err := row.Scan(
-			&ambil.NamarumahSakit,
-			&ambil.Kode,
-			&ambil.Variable,
-			&ambil.Nama,
-			&ambil.Price,
-			&ambil.Diskon,
-		)
-
+		row, err := tx.Query(ctx, queryList, input.Nama)
 		if err != nil {
 			tx.Rollback(ctx)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Stock Barang  123", "status": false})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 			return
 		}
-		Data = append(Data, ambil)
+
+		defer row.Close()
+
+		var Data []model.Price
+
+		for row.Next() {
+			var ambil model.Price
+			err := row.Scan(
+				&ambil.NamarumahSakit,
+				&ambil.Kode,
+				&ambil.Variable,
+				&ambil.Nama,
+				&ambil.Price,
+				&ambil.Diskon,
+				&ambil.Added,
+			)
+
+			if err != nil {
+				tx.Rollback(ctx)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Stock Barang  123", "status": false})
+				return
+			}
+			Data = append(Data, ambil)
+		}
+
+		if err := row.Err(); err != nil {
+			tx.Rollback(ctx)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error iterating over Stock Barang rows", "status": false})
+			return
+		}
+
+		if len(Data) > 0 {
+			c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "data": Data, "status": true})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []model.StockBarang{}, "status": true})
+		}
 	}
 
-	if err := row.Err(); err != nil {
-		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error iterating over Stock Barang rows", "status": false})
-		return
-	}
-
-	if len(Data) > 0 {
-		c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "data": Data, "status": true})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []model.StockBarang{}, "status": true})
-	}
 }
 
 func SetPrice(c *gin.Context) {
@@ -156,12 +228,14 @@ func SetPrice(c *gin.Context) {
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
 		if err := c.Bind(&input); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
 
 	} else {
 
 		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
 
@@ -175,20 +249,47 @@ func SetPrice(c *gin.Context) {
 	defer tx.Rollback(ctx)
 
 	queryInsert := `
-		INSERT INTO price_list (nama_rumah_sakit, kode, variable, nama, diskon, price) 
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO price_list (nama_rumah_sakit, kode, variable, nama, diskon, price, added) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+
+	queryUpdate := `
+		UPDATE price_list
+		SET 
+			nama_rumah_sakit = $1,
+			kode = $2,
+			variable = $3,
+			nama = $4,
+			diskon = $5,
+			price = $6,
+			added = $7
+		WHERE nama_rumah_sakit = $8
 	`
 
 	log.Println("Set To DB Start")
 
 	if len(input.Input) != 0 {
+
 		for _, set := range input.Input {
-			_, err := tx.Exec(context.Background(), queryInsert, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price)
-			if err != nil {
-				tx.Rollback(ctx)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
-				return
+
+			if set.Added == "0" {
+				log.Println("Tambah Ke Price List")
+				_, err := tx.Exec(context.Background(), queryInsert, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1")
+				if err != nil {
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+					return
+				}
+			} else {
+				log.Println("Update Ke Price List")
+				_, err := tx.Exec(context.Background(), queryUpdate, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1", set.NamarumahSakit)
+				if err != nil {
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+					return
+				}
 			}
+
 		}
 	}
 
