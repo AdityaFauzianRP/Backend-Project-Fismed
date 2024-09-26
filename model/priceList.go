@@ -7,6 +7,7 @@ type Price struct {
 	Nama           string `json:"nama"`
 	Diskon         int    `json:"diskon"`
 	Price          string `json:"price"`
+	Added          string `json:"added"`
 }
 
 type Set struct {
