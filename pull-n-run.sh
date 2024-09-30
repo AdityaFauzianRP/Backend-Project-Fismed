@@ -2,6 +2,11 @@
 
 set -e
 
+git pull
+
+git checkout main
+
+
 docker pull boyangyang/fismed-be:latest
 
 # Stop and remove the fismed-be-dev container if it exists
