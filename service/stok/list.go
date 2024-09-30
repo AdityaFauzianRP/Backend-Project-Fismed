@@ -183,9 +183,11 @@ func ListBarangProses(c *gin.Context) {
 	defer row.Close()
 
 	var Data []model.Stock
+	var id int = 1
 
 	for row.Next() {
 		var ambil model.Stock
+		ambil.Id = id
 		err := row.Scan(
 			&ambil.Variable,
 			&ambil.Nama,
@@ -199,7 +201,10 @@ func ListBarangProses(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Data", "status": false})
 			return
 		}
+		ambil.Name = ambil.Nama
+		ambil.Price = ambil.Harga
 		Data = append(Data, ambil)
+		id = id + 1
 	}
 
 	if err := row.Err(); err != nil {
