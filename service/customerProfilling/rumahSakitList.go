@@ -66,22 +66,6 @@ func RumahSakitList(c *gin.Context) {
 
 func SupplierList(c *gin.Context) {
 
-	var input model.CustomerNew
-
-	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
-
-		if err := c.Bind(&input); err != nil {
-			return
-		}
-
-	} else {
-
-		if err := c.BindJSON(&input); err != nil {
-			return
-		}
-
-	}
-
 	ctx := context.Background()
 	tx, err := proformaInvoice.DBConnect.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -95,11 +79,11 @@ func SupplierList(c *gin.Context) {
 			id, 
 			COALESCE(nama_perusahaan, 'default_name') AS name, 
 			COALESCE(address_perusahaan, 'default_address') AS address_company
-		FROM customer where kategori_divisi = $1
+		FROM customer where kategori_divisi = '3'
 		ORDER BY nama_perusahaan, id ASC;
 		`
 
-	rows, err := tx.Query(ctx, query, input.KategoriDivisi)
+	rows, err := tx.Query(ctx, query)
 	if err != nil {
 		tx.Rollback(ctx)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})

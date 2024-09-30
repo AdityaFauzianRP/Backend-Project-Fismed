@@ -94,7 +94,10 @@ func Detail(c *gin.Context) {
 			COALESCE(quantity, '') AS quantity,
 			COALESCE(price, '') AS price,
 			COALESCE(discount::TEXT, '0') || '' AS discount,
-			COALESCE(amount, '') AS amount
+			COALESCE(amount, '') AS amount,
+			COALESCE(kode, '') AS kode,
+			COALESCE(variable , '') AS variable,
+			COALESCE(gudang, '') AS gudang
 		FROM item_buyer WHERE po_id = $1;
 	`
 	rows2, err := tx.Query(ctx, QeuryItem, res.ID)
@@ -116,6 +119,9 @@ func Detail(c *gin.Context) {
 			&get.PriceRP,
 			&get.Discount,
 			&get.Amount,
+			&get.Kode,
+			&get.Variable,
+			&get.Gudang,
 		); err != nil {
 			tx.Rollback(ctx)
 			utility.ResponseError(c, constanta.ErrScan2)

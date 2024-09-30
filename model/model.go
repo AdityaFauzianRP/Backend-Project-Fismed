@@ -4,6 +4,7 @@ import "time"
 
 type StockBarang struct {
 	ID        int       `json:"id,omitempty"`
+	Variable  string    `json:"variable"`
 	Name      string    `json:"name,omitempty"`
 	Total     string    `json:"total,omitempty"`
 	Price     string    `json:"price,omitempty"`
@@ -13,6 +14,8 @@ type StockBarang struct {
 	UpdatedBy string    `json:"updated_by,omitempty"`
 	Katalog   string    `json:"katalog,omitempty"`
 	Gudang    string    `json:"gudang,omitempty"`
+	Kode      string    `json:"kode"`
+	Qty       int       `json:"qty"`
 }
 
 type RequestID struct {

@@ -38,7 +38,7 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/customer-profilling/get-tax-code", logMiddleware(customerProfilling.GetTaxCode))
 	router.POST("/api/customer-profilling/get-by-search", logMiddleware(customerProfilling.GetBySearch))
 	router.POST("/api/proforma-invoice/rs-list", logMiddleware(customerProfilling.RumahSakitList))
-	router.POST("/api/proforma-invoice/comp-list-by-id", logMiddleware(customerProfilling.SupplierList))
+	router.POST("/api/proforma-invoice/supplier", logMiddleware(customerProfilling.SupplierList))
 	router.POST("/api/proforma-invoice/dr-list", logMiddleware(customerProfilling.DokterList))
 
 	// Pro forma Invoice API
@@ -61,7 +61,7 @@ func Routes(router *gin.Engine) {
 	// Pre Order API
 	router.POST("/api/purchase-order/list", logMiddleware(preOrder.ListPO))
 	router.POST("/api/purchase-order/detail", logMiddleware(preOrder.Detail))
-	router.POST("/api/purchase-order/inquiry", logMiddleware(preOrder.Inquiry))
+	router.POST("/api/purchase-order/inquiry", logMiddleware(preOrder.InquiryPO))
 	router.POST("/api/purchase-order/posting", logMiddleware(preOrder.Posting))
 	router.POST("/api/purchase-order/edit/finance", logMiddleware(preOrder.Edit_Finance))
 	router.POST("/api/purchase-order/edit/inquiry", logMiddleware(preOrder.Edit_Admin))

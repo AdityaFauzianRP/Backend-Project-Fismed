@@ -38,6 +38,9 @@ type ItemBuyer struct {
 	PriceRP  string `json:"price_rp,omitempty"`
 	Discount string `json:"discount,omitempty"`
 	Amount   string `json:"amount,omitempty"`
+	Kode     string `json:"kode"`
+	Variable string `json:"variable"`
+	Gudang   string `json:"gudang"`
 }
 
 type ItemBuyer2 struct {
@@ -49,4 +52,39 @@ type ItemBuyer2 struct {
 	PriceRP  string `json:"price_rp,omitempty"`
 	Discount string `json:"discount,omitempty"`
 	Amount   string `json:"amount,omitempty"`
+}
+
+type Item struct {
+	ID       int64  `json:"id"`
+	PoID     int64  `json:"po_id"`
+	Name     string `json:"name"`
+	Quantity string `json:"quantity"`
+	Price    string `json:"price"`
+	Variable string `json:"variable"`
+	Kode     string `json:"kode"`
+	Gudang   string `json:"gudang"`
+	Amount   string `json:"amount"`
+}
+
+type ItemDeleted struct {
+	ID int64 `json:"id"`
+}
+
+type PurchaseOrder2 struct {
+	ID              int64         `json:"id"`
+	NamaSuplier     string        `json:"nama_suplier"`
+	CatatanPO       string        `json:"catatan_po"`
+	PreparedBy      string        `json:"prepared_by"`
+	PreparedJabatan string        `json:"prepared_jabatan"`
+	ApprovedBy      string        `json:"approved_by"`
+	ApprovedJabatan string        `json:"approved_jabatan"`
+	Status          string        `json:"status"`
+	Subtotal        string        `json:"sub_total"`
+	Pajak           string        `json:"pajak"`
+	Total           string        `json:"total"`
+	Tanggal         string        `json:"tanggal"`
+	Nomor_po        string        `json:"nomor_po"`
+	Item            []Item        `json:"item"`
+	ItemDeleted     []ItemDeleted `json:"item_deleted"`
+	Reason          string        `json:"reason"`
 }

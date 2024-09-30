@@ -10,103 +10,57 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func Edit_Admin(c *gin.Context) {
 
-	var input model.PurchaseOrder
-	var res model.PurchaseOrder
+	var input model.PurchaseOrder2
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
 
 		if err := c.Bind(&input); err != nil {
-			utility.ResponseError(c, "Input Data Tidak Berhasil !")
+			return
 		}
 
 	} else {
 
 		if err := c.BindJSON(&input); err != nil {
-			utility.ResponseError(c, "Input Data Tidak Berhasil !")
+			return
 		}
 
 	}
 
 	log.Println("Data Input :", input)
+	var subtotal, total, ppn int
 
-	res.Item = make([]model.ItemBuyer, len(input.Item))
-	res.ItemDeleted = input.ItemDeleted
-	res.ID = input.ID
+	for i, data := range input.Item {
 
-	var Subtotal int
-
-	if len(input.Item) > 0 {
-		for i, item := range input.Item {
-			log.Println("Item Barang Ke :", i)
-			res.Item[i].ID = item.ID
-			res.Item[i].POID = item.POID
-			res.Item[i].Name = item.Name
-			res.Item[i].Quantity = item.Quantity
-			res.Item[i].Price = "Rp. " + utility.FormatRupiah(item.Price)
-
-			QuantitiInt, err := strconv.Atoi(item.Quantity)
-			if err != nil {
-				c.JSON(400, gin.H{"error": "Invalid Quantity format"})
-				return
-			}
-
-			item.Price = utility.RupiahToNumber(item.Price)
-
-			HargaSatuanInt, err := strconv.Atoi(item.Price)
-			if err != nil {
-				c.JSON(400, gin.H{"error": "Invalid Harga Satuan format"})
-				return
-			}
-
-			item.Discount = utility.PersenToNumber(item.Discount)
-
-			DiscountInt, err := strconv.Atoi(item.Discount)
-			if err != nil {
-				c.JSON(400, gin.H{"error": "Invalid Discount format"})
-				return
-			}
-
-			res.Item[i].Price = "Rp. " + utility.FormatRupiah(item.Price)
-			res.Item[i].Discount = item.Discount + "%"
-
-			subtotalperitem := QuantitiInt*HargaSatuanInt - (QuantitiInt * HargaSatuanInt * DiscountInt / 100)
-
-			Subtotal = Subtotal + subtotalperitem
-
-			subtotalperitemstring := strconv.Itoa(subtotalperitem)
-
-			res.Item[i].Amount = "Rp. " + utility.FormatRupiah(subtotalperitemstring)
+		harga1, err := strconv.Atoi(data.Price)
+		if err != nil {
+			log.Println("Harga Bukan String !")
+			return
 		}
 
-		pajak := Subtotal * 11 / 100
-		total := pajak + Subtotal
+		pcs, err := strconv.Atoi(data.Quantity)
+		if err != nil {
+			log.Println("Quantity Bukan String !")
+			return
+		}
 
-		res.Total = "Rp. " + utility.FormatRupiah(strconv.Itoa(total))
-		res.Pajak = "Rp. " + utility.FormatRupiah(strconv.Itoa(pajak))
-		res.SubTotal = "Rp. " + utility.FormatRupiah(strconv.Itoa(Subtotal))
+		input.Item[i].Amount = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1*pcs))
+		input.Item[i].Price = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1))
 
-		currentTime := time.Now()
-		timeString := currentTime.Format("2006-01-02")
-
-		res.NamaSuplier = input.NamaSuplier
-		res.NomorPO = utility.GenerateNomorPO()
-		res.Tanggal = timeString
-		res.CatatanPO = input.CatatanPO
-		res.PreparedBy = input.PreparedBy
-		res.PreparedJabatan = input.PreparedJabatan
-		res.ApprovedBy = input.ApprovedBy
-		res.ApprovedJabatan = input.ApprovedJabatan
-
-		c.JSON(http.StatusOK, gin.H{"message": "Inquiry Purcase Order Success !", "data": res, "status": true})
-
-	} else {
-		utility.ResponseError(c, "Item Empty!")
+		subtotal = subtotal + harga1*pcs
 	}
+
+	ppn = subtotal * 11 / 100
+	total = ppn + subtotal
+
+	input.Subtotal = "Rp. " + utility.FormatRupiah(strconv.Itoa(subtotal))
+	input.Pajak = "Rp. " + utility.FormatRupiah(strconv.Itoa(ppn))
+	input.Total = "Rp. " + utility.FormatRupiah(strconv.Itoa(total))
+
+	c.JSON(http.StatusOK, gin.H{"message": "Inquiry Purcase Order Success !", "data": input, "status": true})
 
 }
 
@@ -189,6 +143,64 @@ func Edit_Finance(c *gin.Context) {
 			return
 		}
 
+		// Masukan Ke Table Stok sebagai penambahan Barang
+		var cekStok, idGudang int
+
+		for _, data := range input.Item {
+
+			querySelectGudang := `
+				select id from gudang g where nama_gudang = $1
+			`
+
+			err = tx.QueryRow(ctx, querySelectGudang, data.Gudang).Scan(&idGudang)
+			if err != nil {
+				tx.Rollback(ctx)
+				utility.ResponseError(c, "Error Pengecekan Data Gudang !")
+				return
+			}
+
+			queryCek := `
+				select count(*)  from stock s where nama  = $1 and gudang_id = $2
+			`
+			err := tx.QueryRow(ctx, queryCek, data.Name, idGudang).Scan(&cekStok)
+			if err != nil {
+				tx.Rollback(ctx)
+				utility.ResponseError(c, "Error Pengecekan Data Stok !")
+				return
+			}
+
+			if cekStok == 0 {
+				log.Println("Tambah Data Baru Di Gudang !")
+
+				queryInsertBarang := `
+					INSERT INTO stock (variable, nama, qty, price, gudang_id, kode) 
+					VALUES ($1, $2, $3, $4, $5, $6)
+				`
+				_, err := tx.Exec(ctx, queryInsertBarang, data.Variable, data.Name, data.Quantity, data.Price, idGudang, data.Kode)
+				if err != nil {
+					tx.Rollback(ctx)
+					log.Println("Error Detail : ", err)
+					utility.ResponseError(c, "Error Insert Data Barang Baru !")
+					return
+				}
+			} else {
+				log.Println("Update Data Di Gudang !")
+
+				queryUpdateBarang := `
+					UPDATE stock 
+					SET variable = $1, nama = $2, qty = qty + $3, price = $4, kode = $5 
+					WHERE nama = $6 AND gudang_id = $7;
+				`
+				_, err := tx.Exec(ctx, queryUpdateBarang, data.Variable, data.Name, data.Quantity, data.Price, data.Kode, data.Name, idGudang)
+				if err != nil {
+					tx.Rollback(ctx)
+					log.Println("Error Detail : ", err)
+					utility.ResponseError(c, "Error Update Data Barang !")
+					return
+				}
+			}
+		}
+
 		// Masukan Ke Table Pengeluaran sebagai catatan
 
 		QueryPengeluaran := `
@@ -217,7 +229,7 @@ func Edit_Finance(c *gin.Context) {
 }
 
 func Posting_Edit_admin(c *gin.Context) {
-	var input model.PurchaseOrder
+	var input model.PurchaseOrder2
 	//var res model.PurchaseOrder
 
 	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
@@ -266,15 +278,15 @@ func Posting_Edit_admin(c *gin.Context) {
 
 	_, err = tx.Exec(ctx, query,
 		input.NamaSuplier,
-		input.NomorPO,
+		input.Nomor_po,
 		input.Tanggal,
 		input.CatatanPO,
 		input.PreparedBy,
 		input.PreparedJabatan,
 		input.ApprovedBy,
 		input.ApprovedJabatan,
-		utility.FormatTanggal1(time.Now()), // Ensure this function returns a suitable format
-		input.SubTotal,
+		"ADMIN",
+		input.Subtotal,
 		input.Pajak,
 		input.Total,
 		input.ID,
@@ -289,16 +301,18 @@ func Posting_Edit_admin(c *gin.Context) {
 		for _, item := range input.Item {
 			if item.ID == 0 {
 				QueryItem := `
-				INSERT INTO item_buyer (
-					po_id, 
-					name, 
-					quantity, 
-					price, 
-					discount, 
-					amount
-				) VALUES ($1, $2, $3, $4, $5, $6)`
+					INSERT INTO item_buyer (
+						po_id, 
+						name, 
+						quantity, 
+						price, 
+						amount,
+						kode,
+						variable,
+						gudang
+					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-				_, err = tx.Exec(context.Background(), QueryItem, input.ID, item.Name, item.Quantity, item.Price, item.Discount, item.Amount)
+				_, err = tx.Exec(context.Background(), QueryItem, input.ID, item.Name, item.Quantity, item.Price, item.Amount, item.Kode, item.Variable, item.Gudang)
 				if err != nil {
 					tx.Rollback(ctx)
 					utility.ResponseError(c, "Error on Add New Item")
@@ -313,17 +327,21 @@ func Posting_Edit_admin(c *gin.Context) {
 						name=$1, 
 						quantity=$2, 
 						price=$3, 
-						discount=$4, 
-						amount=$5
-					WHERE id=$6
+						amount=$4,
+						kode=$5,
+						variable=$6,
+						gudang=$7
+					WHERE id=$8
 				`
 
 				_, err = tx.Exec(ctx, queryUpdateItem,
 					item.Name,
 					item.Quantity,
 					item.Price,
-					item.Discount,
 					item.Amount,
+					item.Kode,
+					item.Variable,
+					item.Gudang,
 					item.ID,
 				)
 

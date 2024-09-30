@@ -19,7 +19,21 @@ func List(c *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	query := "SELECT id, name, total, price, created_at, created_by, updated_at, updated_by, katalog, gudang FROM public.stock_items;"
+	query := `
+		SELECT 
+			a.variable,
+			a.nama,
+			SUM(a.qty) AS total_qty,
+			a.kode,
+			a.price
+		FROM stock a
+		GROUP BY 
+			a.variable,
+			a.nama,
+			a.kode,
+			a.price
+		ORDER BY a.nama;
+	`
 
 	rows, err := tx.Query(ctx, query)
 	if err != nil {
@@ -35,16 +49,11 @@ func List(c *gin.Context) {
 	for rows.Next() {
 		var res model.StockBarang
 		if err := rows.Scan(
-			&res.ID,
+			&res.Variable,
 			&res.Name,
-			&res.Total,
+			&res.Qty,
+			&res.Kode,
 			&res.Price,
-			&res.CreatedAt,
-			&res.CreatedBy,
-			&res.UpdatedAt,
-			&res.UpdatedBy,
-			&res.Katalog,
-			&res.Gudang,
 		); err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Stock Barang  123", "status": false})

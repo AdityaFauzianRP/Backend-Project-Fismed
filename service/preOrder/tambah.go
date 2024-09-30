@@ -80,10 +80,13 @@ func Posting(c *gin.Context) {
 					quantity, 
 					price, 
 					discount, 
-					amount
-				) VALUES ($1, $2, $3, $4, $5, $6)`
+					amount,
+					kode,
+					variable,
+				    gudang
+				) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 
-			_, err = tx.Exec(context.Background(), QueryItem, id, item.Name, item.Quantity, item.Price, item.Discount, item.Amount)
+			_, err = tx.Exec(context.Background(), QueryItem, id, item.Name, item.Quantity, item.Price, item.Discount, item.Amount, item.Kode, item.Variable, item.Gudang)
 			if err != nil {
 				tx.Rollback(ctx)
 				utility.ResponseError(c, constanta.ErrQuery2)
@@ -188,4 +191,56 @@ func Inquiry(c *gin.Context) {
 		utility.ResponseError(c, "Item Empty!")
 	}
 
+}
+
+func InquiryPO(c *gin.Context) {
+	var input model.PurchaseOrder2
+
+	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
+
+		if err := c.Bind(&input); err != nil {
+			return
+		}
+
+	} else {
+
+		if err := c.BindJSON(&input); err != nil {
+			return
+		}
+
+	}
+
+	log.Println("Data Input :", input)
+	var subtotal, total, ppn int
+	input.Tanggal = utility.FormatTanggal2(time.Now())
+	input.Nomor_po = utility.GenerateNomorPO()
+
+	for i, data := range input.Item {
+
+		harga1, err := strconv.Atoi(data.Price)
+		if err != nil {
+			log.Println("Harga Bukan String !")
+			return
+		}
+
+		pcs, err := strconv.Atoi(data.Quantity)
+		if err != nil {
+			log.Println("Quantity Bukan String !")
+			return
+		}
+
+		input.Item[i].Amount = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1*pcs))
+		input.Item[i].Price = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1))
+
+		subtotal = subtotal + harga1*pcs
+	}
+
+	ppn = subtotal * 11 / 100
+	total = ppn + subtotal
+
+	input.Subtotal = "Rp. " + utility.FormatRupiah(strconv.Itoa(subtotal))
+	input.Pajak = "Rp. " + utility.FormatRupiah(strconv.Itoa(ppn))
+	input.Total = "Rp. " + utility.FormatRupiah(strconv.Itoa(total))
+
+	c.JSON(http.StatusOK, gin.H{"message": "Inquiry Purcase Order Success !", "data": input, "status": true})
 }
