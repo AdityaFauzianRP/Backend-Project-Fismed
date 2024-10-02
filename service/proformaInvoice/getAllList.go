@@ -2,9 +2,11 @@ package proformaInvoice
 
 import (
 	"backend_project_fismed/model"
+	"backend_project_fismed/utility"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
+	"log"
 	"net/http"
 )
 
@@ -20,26 +22,25 @@ func GetAllList(c *gin.Context) {
 	query := `
 		select 
 			COALESCE(a.id, 0) AS id, 
-			COALESCE(a.customer_id, 0) AS customer_id, 
+			COALESCE(a.customer, '') AS customer, 
 			COALESCE(a.status, '') AS status, 
 			COALESCE(a.divisi, '') AS divisi, 
 			COALESCE(a.invoice_number, '') AS invoice_number, 
-			COALESCE(a.po_number, '') AS po_number,  
 			COALESCE(a.sub_total, '') AS sub_total, 
 			COALESCE(a.pajak, '') AS pajak, 
 			COALESCE(a.total, '') AS total, TO_CHAR(
 			COALESCE(a.created_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS created_at, 
 			COALESCE(a.created_by, '') AS created_by, TO_CHAR(
 			COALESCE(a.update_at, '1970-01-01 00:00:00'::timestamp), 'YYYY-MM-DD') AS update_at, 
-			COALESCE(a.updated_by, '') AS updated_by ,
-			C.nama_perusahaan  
-		from performance_invoice a, customer c where A.customer_id = C.id  ORDER BY id;
+			COALESCE(a.updated_by, '') AS updated_by 
+		from performance_invoice a  ORDER BY id;
 
 	`
 
 	rows, err := tx.Query(ctx, query)
 	if err != nil {
 		tx.Rollback(ctx)
+		log.Println("Error Get All Data ! : ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 		return
 	}
@@ -50,11 +51,10 @@ func GetAllList(c *gin.Context) {
 		var res model.PerformanceInvoice
 		if err := rows.Scan(
 			&res.ID,
-			&res.CustomerID,
+			&res.NamaCompany,
 			&res.Status,
 			&res.Divisi,
 			&res.InvoiceNumber,
-			&res.PONumber,
 			&res.SubTotal,
 			&res.Pajak,
 			&res.Total,
@@ -62,12 +62,14 @@ func GetAllList(c *gin.Context) {
 			&res.CreatedBy,
 			&res.UpdateAt,
 			&res.UpdatedBy,
-			&res.NamaCompany,
 		); err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
+
+		res.Total = "Rp. " + utility.FormatRupiah(res.Total)
+
 		Responses = append(Responses, res)
 	}
 

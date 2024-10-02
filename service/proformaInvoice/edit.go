@@ -59,6 +59,9 @@ func EditPI(c *gin.Context) {
 			response.ItemDetailPI[i].Quantity = item.Quantity
 			response.ItemDetailPI[i].HargaSatuan = item.HargaSatuan
 			response.ItemDetailPI[i].Discount = item.Discount
+			response.ItemDetailPI[i].Kode = item.Kode
+			response.ItemDetailPI[i].Variable = item.Variable
+			response.ItemDetailPI[i].Gudang = item.Gudang
 
 			QuantitiInt, err := strconv.Atoi(item.Quantity)
 			if err != nil {

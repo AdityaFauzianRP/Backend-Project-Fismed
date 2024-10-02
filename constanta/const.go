@@ -30,3 +30,18 @@ const (
 	CustomerNonRS      string = "2"
 	CustomerAsSupplier string = "3"
 )
+
+var RomanMonths = map[string]string{
+	"01": "I",
+	"02": "II",
+	"03": "III",
+	"04": "IV",
+	"05": "V",
+	"06": "VI",
+	"07": "VII",
+	"08": "VIII",
+	"09": "IX",
+	"10": "X",
+	"11": "XI",
+	"12": "XII",
+}

@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
+	"log"
 	"net/http"
 )
 
@@ -38,12 +39,11 @@ func DetailPI(c *gin.Context) {
 	queryDetailPI := `
 		SELECT 
 			COALESCE(a.id, 0) AS id,
-			COALESCE(a.customer_id, 0) AS customer_id,
+			COALESCE(a.customer, '') AS customer,
 			COALESCE(a.sub_total, '') AS sub_total,
 			COALESCE(a.status, '') AS status,
 			COALESCE(a.divisi, '') AS divisi,
 			COALESCE(a.invoice_number, '') AS invoice_number,
-			COALESCE(a.po_number, '') AS po_number,
 			COALESCE(a.due_date , '') AS due_date,
 			COALESCE(a.doctor_name, '') AS doctor_name,
 			COALESCE(a.patient_name, '') AS patient_name,
@@ -53,14 +53,14 @@ func DetailPI(c *gin.Context) {
 			COALESCE(a.rm, '') AS rm,
 			COALESCE(a.number_si, '') AS number_si,
 			COALESCE(a.reason, '') AS reason,
-			COALESCE(c.nama_company, '') AS nama_company,
-			COALESCE(c.address_company , '') AS address_company
+			COALESCE(a.alamat_customer , '') AS alamat_customer
 		FROM 
-			performance_invoice a, customer c where a.customer_id = c.id and a.id = $1
+			performance_invoice a where a.id = $1
 	`
 
 	rows, err := tx.Query(ctx, queryDetailPI, input.ID)
 	if err != nil {
+		log.Println("Error Detail PI ! : ", err)
 		return
 	}
 
@@ -76,12 +76,11 @@ func DetailPI(c *gin.Context) {
 	for rows.Next() {
 		err := rows.Scan(
 			&invoice.ID,
-			&invoice.CustomerID,
+			&invoice.Customer,
 			&invoice.SubTotal,
 			&invoice.Status,
 			&invoice.Divisi,
 			&invoice.InvoiceNumber,
-			&invoice.PONumber,
 			&invoice.DueDate,
 			&invoice.DoctorName,
 			&invoice.PatientName,
@@ -91,7 +90,6 @@ func DetailPI(c *gin.Context) {
 			&invoice.RM,
 			&invoice.NumberSI,
 			&invoice.Reason,
-			&invoice.Customer,
 			&invoice.AlamaCustomer,
 		)
 
@@ -106,11 +104,13 @@ func DetailPI(c *gin.Context) {
 		select 
 			id , 
 			COALESCE("name", '') AS "name",
+			COALESCE(variable , '') AS variable,
 			COALESCE(quantity, '') AS quantity,
 			COALESCE(price, '') AS price,
 			COALESCE(discount, '') AS discount,
 			COALESCE(sub_total, '') AS sub_total,
-			COALESCE(kat, '') AS kat
+			COALESCE(kode, '') AS kode,
+			COALESCE(gudang, '') AS gudang
 		from order_items oi where pi_id = $1
 	`
 
@@ -130,22 +130,30 @@ func DetailPI(c *gin.Context) {
 		err := rows.Scan(
 			&ambil.Id,
 			&ambil.NamaBarang,
+			&ambil.Variable,
 			&ambil.Quantity,
 			&ambil.HargaSatuan,
 			&ambil.Discount,
 			&ambil.SubTotalItem,
 			&ambil.Kat,
+			&ambil.Gudang,
 		)
 		if err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to Scan query", "status": false})
 			return
 		}
+		ambil.Kode = ambil.Kat
 
 		TampungItem = append(TampungItem, ambil)
 	}
 
-	invoice.ItemDetailPI = TampungItem
+	if len(TampungItem) != 0 {
+		invoice.ItemDetailPI = TampungItem
+
+	} else {
+		invoice.ItemDetailPI = []model.ResItemDetail{}
+	}
 
 	if input.Export == "YES" {
 		utility.ExportPI(c, invoice)
