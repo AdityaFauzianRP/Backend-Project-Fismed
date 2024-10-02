@@ -142,6 +142,7 @@ func ListByCustomer(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Data", "status": false})
 				return
 			}
+			ambil.Name = ambil.Nama
 			ambil.NamarumahSakit = input.Nama
 			ambil.Price = "0"
 			ambil.Diskon = 0
@@ -198,6 +199,8 @@ func ListByCustomer(c *gin.Context) {
 				&ambil.Diskon,
 				&ambil.Added,
 			)
+
+			ambil.Name = ambil.Nama
 
 			if err != nil {
 				tx.Rollback(ctx)

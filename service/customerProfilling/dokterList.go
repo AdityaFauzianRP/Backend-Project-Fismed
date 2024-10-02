@@ -11,6 +11,23 @@ import (
 )
 
 func DokterList(c *gin.Context) {
+
+	var input model.RequestID
+
+	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
+
+		if err := c.Bind(&input); err != nil {
+			return
+		}
+
+	} else {
+
+		if err := c.BindJSON(&input); err != nil {
+			return
+		}
+
+	}
+
 	ctx := context.Background()
 	tx, err := proformaInvoice.DBConnect.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -22,11 +39,11 @@ func DokterList(c *gin.Context) {
 	query := `
 		SELECT DISTINCT ON (nama_dokter) 
 			COALESCE(nama_dokter, 'default_name') AS name
-		FROM customer
+		FROM customer where nama_perusahaan = $1 
 		ORDER BY nama_dokter ASC;
 		`
 
-	rows, err := tx.Query(ctx, query)
+	rows, err := tx.Query(ctx, query, input.Nama)
 	if err != nil {
 		tx.Rollback(ctx)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})

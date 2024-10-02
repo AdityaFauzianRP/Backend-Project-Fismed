@@ -43,8 +43,8 @@ func Routes(router *gin.Engine) {
 
 	// Pro forma Invoice API
 	router.POST("/api/proforma-invoice/get-all-list", logMiddleware(proformaInvoice.GetAllList))
-	router.POST("/api/proforma-invoice/inquiry", logMiddleware(proformaInvoice.Inquiry))
-	router.POST("/api/proforma-invoice/posting", logMiddleware(proformaInvoice.Posting))
+	router.POST("/api/proforma-invoice/inquiry", logMiddleware(proformaInvoice.InquiryPI))
+	router.POST("/api/proforma-invoice/posting", logMiddleware(proformaInvoice.PostingPI))
 	router.POST("/api/proforma-invoice/detailPI", logMiddleware(proformaInvoice.DetailPI))
 	router.POST("/api/proforma-invoice/editPI-inquiry", logMiddleware(proformaInvoice.EditPI))
 	router.POST("/api/proforma-invoice/editPI-posting", logMiddleware(proformaInvoice.PostingEdit_PI))
