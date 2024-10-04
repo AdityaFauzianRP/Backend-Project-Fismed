@@ -4,6 +4,7 @@ import (
 	"backend_project_fismed/model"
 	"backend_project_fismed/utility"
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
 	"log"
@@ -339,6 +340,66 @@ func EditAdmin(c *gin.Context) {
 
 	if input.Status == "Diterima" {
 		log.Println("PI diterima admin, update status ke :", input.Status)
+		//  Kurangi Jumalh Stok Barang di gudang tujuan
+		if len(input.ItemDetailPI) != 0 {
+			for _, detail := range input.ItemDetailPI {
+
+				queryGetGudang := `select id from gudang g where nama_gudang = $1 `
+
+				var gudangId int
+				err := tx.QueryRow(ctx, queryGetGudang, detail.Gudang).Scan(&gudangId)
+				if err != nil {
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query Pengurangan Stock", "status": false})
+					return
+				}
+
+				log.Println("Gudang Id : ", gudangId)
+
+				queryCekQty := `SELECT qty FROM stock WHERE nama = $1 and gudang_id = $2`
+				var currentQty int
+				err2 := tx.QueryRow(ctx, queryCekQty, detail.NamaBarang, gudangId).Scan(&currentQty)
+				if err2 != nil {
+					tx.Rollback(ctx)
+					log.Println("Error Qeury : ", err2)
+
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"message": fmt.Sprintf("Data di gudang untuk nama barang : <b>" + detail.NamaBarang + " TIDAK ADA!</b>, Silahkan Cek Pada Gudang : <b>" + detail.Gudang + "</b>"),
+						"status":  false,
+					})
+					return
+				}
+
+				log.Println("Current Quantity : ", currentQty)
+
+				quantity, _ := strconv.Atoi(detail.Quantity)
+
+				if currentQty-quantity < 0 {
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"message": fmt.Sprintf("Data di gudang untuk nama barang : <b>" + detail.NamaBarang + " TIDAK CUKUP!</b>, Silahkan Cek Pada Gudang : <b>" + detail.Gudang + "</b>"),
+						"status":  false,
+					})
+					return
+				}
+
+				queryPenguranganStokc := `
+					UPDATE stock
+					SET qty = qty - $1
+					WHERE nama = $2 and gudang_id = $3
+				`
+
+				_, err3 := tx.Exec(ctx, queryPenguranganStokc, quantity, detail.NamaBarang, gudangId)
+				if err3 != nil {
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query Pengurangan Stock", "status": false})
+					return
+				}
+
+			}
+		}
+
+		//  Berhasil Masuk Ke Keuangan Mereka
+
 		query := `
 			UPDATE performance_invoice
 			SET
@@ -352,8 +413,11 @@ func EditAdmin(c *gin.Context) {
 			input.Status,
 			input.ID,
 		)
-
-		//  Berhasil Masuk Ke Keuangan Mereka
+		if err != nil {
+			tx.Rollback(ctx)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+			return
+		}
 
 	} else if input.Status == "Ditolak" {
 		log.Println("PI ditolak admin, update status ke :", input.Status)
@@ -374,8 +438,11 @@ func EditAdmin(c *gin.Context) {
 			input.Reason,
 			input.ID,
 		)
-
-		//  Berhasil Masuk Ke Keuangan Mereka
+		if err != nil {
+			tx.Rollback(ctx)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+			return
+		}
 
 	}
 

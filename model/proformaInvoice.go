@@ -33,6 +33,7 @@ type ProformaInvoice struct {
 	Pajak           string        `json:"pajak"`
 	Subtotal        string        `json:"subtotal"`
 	Total           string        `json:"total"`
+	RP_sub_total    string        `json:"RP_sub_total"`
 	Item            []ItemPI      `json:"item"`
 	ItemDeleted     []DeletedItem `json:"item_deleted"`
 }

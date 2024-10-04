@@ -123,6 +123,35 @@ func Edit_Finance(c *gin.Context) {
 	}
 
 	if input.Status == "DITERIMA" {
+
+		queryListRs := `
+		SELECT DISTINCT ON (nama_rumah_sakit) 
+				COALESCE(nama_rumah_sakit, 'default_name') AS name
+				FROM price_list
+		ORDER BY nama_rumah_sakit, id ASC;
+		`
+
+		rows, err := tx.Query(ctx, queryListRs)
+		if err != nil {
+			tx.Rollback(ctx)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+			return
+		}
+		defer rows.Close()
+
+		var ListRS []model.Customer
+		for rows.Next() {
+			var res model.Customer
+			if err := rows.Scan(
+				&res.Name,
+			); err != nil {
+				tx.Rollback(ctx)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+				return
+			}
+			ListRS = append(ListRS, res)
+		}
+
 		query := `
 			UPDATE purchase_order
 			SET
@@ -183,6 +212,23 @@ func Edit_Finance(c *gin.Context) {
 					utility.ResponseError(c, "Error Insert Data Barang Baru !")
 					return
 				}
+
+				if len(ListRS) != 0 {
+					for _, rs := range ListRS {
+						queryInsertBarangPerusahaan := `
+							INSERT INTO price_list (nama_rumah_sakit, kode, variable, nama, diskon, price, added)
+							VALUES ($1, $2, $3, $4, $5, $6, $7)
+						`
+						_, err = tx.Exec(ctx, queryInsertBarangPerusahaan, rs.Name, data.Kode, data.Variable, data.Name, "0", "0", "1")
+						if err != nil {
+							tx.Rollback(ctx)
+							log.Println("Error Detail : ", err)
+							utility.ResponseError(c, "Error Insert Data Barang Baru !")
+							return
+						}
+					}
+				}
+
 			} else {
 				log.Println("Update Data Di Gudang !")
 
