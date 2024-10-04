@@ -75,6 +75,7 @@ func InquiryPI(c *gin.Context) {
 	input.Total = "Rp. " + utility.FormatRupiah(strconv.Itoa(total))
 	input.Pajak = "Rp. " + utility.FormatRupiah(strconv.Itoa(ppn))
 	input.Subtotal = "Rp. " + utility.FormatRupiah(strconv.Itoa(subtotal))
+	input.RP_sub_total = input.Subtotal
 
 	c.JSON(http.StatusOK, gin.H{"message": "Inquiry Performa Invoice Success !", "data": input, "status": true})
 }
