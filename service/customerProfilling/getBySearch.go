@@ -68,7 +68,7 @@ func GetBySearch(c *gin.Context) {
 	rows, err := tx.Query(ctx, query, input.Name)
 	if err != nil {
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 		return
 	}
 	defer rows.Close()
@@ -119,16 +119,18 @@ func GetBySearch(c *gin.Context) {
 
 	// Hitung Jumlah Order PI
 	for _, customer := range response {
+		log.Println("Customer : ", customer)
+
 		hitungPI := `
 		SELECT COUNT(*) AS total_invoices
 		FROM performance_invoice
-		WHERE customer_id = $1;
+		WHERE customer = $1;
 		`
 		var hitungpi int
-		err := tx.QueryRow(ctx, hitungPI, customer.ID).Scan(&hitungpi)
+		err := tx.QueryRow(ctx, hitungPI, input.Name).Scan(&hitungpi)
 		if err != nil {
 			tx.Rollback(ctx)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
 

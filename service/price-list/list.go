@@ -266,7 +266,7 @@ func SetPrice(c *gin.Context) {
 			diskon = $5,
 			price = $6,
 			added = $7
-		WHERE nama_rumah_sakit = $8
+		WHERE nama = $8
 	`
 
 	log.Println("Set To DB Start")
