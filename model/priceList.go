@@ -1,6 +1,7 @@
 package model
 
 type Price struct {
+	ID             int    `json:"id"`
 	NamarumahSakit string `json:"nama_Rumah_Sakit"`
 	Kode           string `json:"kode"`
 	Variable       string `json:"variable"`

@@ -215,17 +215,34 @@ func Edit_Finance(c *gin.Context) {
 
 				if len(ListRS) != 0 {
 					for _, rs := range ListRS {
-						queryInsertBarangPerusahaan := `
+
+						SCANCEK := 0
+
+						queryCek := `
+
+							select count(*)  from price_list s where nama = $1 and nama_rumah_sakit = $2
+						`
+						err := tx.QueryRow(ctx, queryCek, data.Name, rs.Name).Scan(&SCANCEK)
+						if err != nil {
+							tx.Rollback(ctx)
+							utility.ResponseError(c, "Error Pengecekan Data Stok !")
+							return
+						}
+
+						if SCANCEK == 0 {
+							queryInsertBarangPerusahaan := `
 							INSERT INTO price_list (nama_rumah_sakit, kode, variable, nama, diskon, price, added)
 							VALUES ($1, $2, $3, $4, $5, $6, $7)
 						`
-						_, err = tx.Exec(ctx, queryInsertBarangPerusahaan, rs.Name, data.Kode, data.Variable, data.Name, "0", "0", "1")
-						if err != nil {
-							tx.Rollback(ctx)
-							log.Println("Error Detail : ", err)
-							utility.ResponseError(c, "Error Insert Data Barang Baru !")
-							return
+							_, err = tx.Exec(ctx, queryInsertBarangPerusahaan, rs.Name, data.Kode, data.Variable, data.Name, "0", data.Price, "1")
+							if err != nil {
+								tx.Rollback(ctx)
+								log.Println("Error Detail : ", err)
+								utility.ResponseError(c, "Error Insert Data Barang Baru !")
+								return
+							}
 						}
+
 					}
 				}
 
