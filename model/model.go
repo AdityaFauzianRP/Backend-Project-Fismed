@@ -23,6 +23,7 @@ type RequestID struct {
 	Divisi string `json:"divisi,omitempty"`
 	Export string `json:"export,omitempty"`
 	Nama   string `json:"nama"`
+	DOK    string `json:"dok"`
 }
 
 type PerformanceInvoice struct {
@@ -123,6 +124,7 @@ type Customer struct {
 	Top                string `json:"top,omitempty"`
 	Handphone          string `json:"handphone,omitempty"`
 	DocktorName        string `json:"docktor_name"`
+	KategoriDivisi     string `json:"kategori_divisi"`
 }
 
 type PerformanceInvoiceDetail struct {
@@ -148,6 +150,7 @@ type PerformanceInvoiceDetail struct {
 	Tanggal         string `json:"tanggal"`
 	Customer        string `json:"rumah_sakit"`
 	AlamaCustomer   string `json:"alamat"`
+	Catatan         string `json:"catatan"`
 
 	ItemDetailPI []ResItemDetail `json:"item_detail_pi"`
 }

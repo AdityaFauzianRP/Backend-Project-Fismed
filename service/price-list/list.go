@@ -128,6 +128,7 @@ func ListByCustomer(c *gin.Context) {
 		defer row.Close()
 
 		var Data []model.Price
+		hitung := 0
 
 		for row.Next() {
 			var ambil model.Price
@@ -147,6 +148,9 @@ func ListByCustomer(c *gin.Context) {
 			ambil.Price = "0"
 			ambil.Diskon = 0
 			ambil.Added = "0"
+
+			ambil.ID = hitung + 1
+			hitung = hitung + 1
 			Data = append(Data, ambil)
 		}
 
@@ -187,6 +191,7 @@ func ListByCustomer(c *gin.Context) {
 		defer row.Close()
 
 		var Data []model.Price
+		hitung := 0
 
 		for row.Next() {
 			var ambil model.Price
@@ -199,7 +204,8 @@ func ListByCustomer(c *gin.Context) {
 				&ambil.Diskon,
 				&ambil.Added,
 			)
-
+			ambil.ID = hitung + 1
+			hitung = hitung + 1
 			ambil.Name = ambil.Nama
 
 			if err != nil {
@@ -277,7 +283,7 @@ func SetPrice(c *gin.Context) {
 
 			if set.Added == "0" {
 				log.Println("Tambah Ke Price List")
-				_, err := tx.Exec(context.Background(), queryInsert, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1")
+				_, err := tx.Exec(ctx, queryInsert, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1")
 				if err != nil {
 					tx.Rollback(ctx)
 					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
@@ -285,7 +291,7 @@ func SetPrice(c *gin.Context) {
 				}
 			} else {
 				log.Println("Update Ke Price List")
-				_, err := tx.Exec(context.Background(), queryUpdate, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1", set.NamarumahSakit)
+				_, err := tx.Exec(ctx, queryUpdate, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1", set.Nama)
 				if err != nil {
 					tx.Rollback(ctx)
 					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})

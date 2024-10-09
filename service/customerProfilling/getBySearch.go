@@ -59,7 +59,8 @@ func GetBySearch(c *gin.Context) {
 			COALESCE(cp_dokter , '') AS contact_person,
 			COALESCE(CAST(tax_code  AS TEXT), '0') AS tax_code_id,
 			COALESCE(term_of_payment , '') AS top,
-			coalesce(nama_dokter, '')as nama_dokter 
+			coalesce(nama_dokter, '')as nama_dokter ,
+			kategori_divisi 
 		FROM 
 			public.customer
 		where nama_perusahaan = $1;
@@ -100,6 +101,7 @@ func GetBySearch(c *gin.Context) {
 			&tc.TaxCodeID,
 			&tc.Top,
 			&tc.DocktorName,
+			&tc.KategoriDivisi,
 		); err != nil {
 			log.Println("[--->]", "Error Scan Data :", error(err))
 			tx.Rollback(ctx)
