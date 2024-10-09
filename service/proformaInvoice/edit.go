@@ -146,33 +146,35 @@ func PostingEdit_PI(c *gin.Context) {
 
 	input.Status = "Diproses"
 
+	input.TotalRP = utility.RupiahToNumber(input.TotalRP)
+	input.SubTotalRP = utility.RupiahToNumber(input.SubTotalRP)
+	input.PajakPPNRP = utility.RupiahToNumber(input.PajakPPNRP)
+
 	if input.Divisi == "Radiologi" {
 		query := `
 			UPDATE performance_invoice
 			SET
-				customer_id = $1,
+				customer = $1,
 				sub_total = $2,
 				status = $3,
 				divisi = $4,
 				invoice_number = $5,
-				po_number = $6,
-				due_date = $7,
-				pajak = $8,
-				total = $9,
-				number_si = $10,
+				due_date = $6,
+				pajak = $7,
+				total = $8,
+				number_si = $9,
 				update_at = now(),
 				updated_by = 'sales',
-				reason = $11
-			WHERE id = $12;
+				reason = $10
+			WHERE id = $11;
 			`
 
 		_, err = tx.Exec(context.Background(), query,
-			input.CustomerID,
+			input.Customer,
 			input.SubTotalRP,
 			"Diproses",
 			input.Divisi,
 			input.InvoiceNumber,
-			input.PONumber,
 			input.DueDate,
 			input.PajakPPNRP,
 			input.TotalRP,
@@ -187,33 +189,31 @@ func PostingEdit_PI(c *gin.Context) {
 		query := `
 			UPDATE performance_invoice
 			SET
-				customer_id = $1,
+				customer = $1,
 				sub_total = $2,
 				status = $3,
 				divisi = $4,
 				invoice_number = $5,
-				po_number = $6,
-				due_date = $7,
-				doctor_name = $8,
-				patient_name = $9,
-				pajak = $10,
-				total = $11,
-				tanggal_tindakan = $12,
-				rm = $13,
-				number_si = $14,
+				due_date = $6,
+				doctor_name = $7,
+				patient_name = $8,
+				pajak = $9,
+				total = $10,
+				tanggal_tindakan = $11,
+				rm = $12,
+				number_si = $13,
 				update_at = now(),
 				updated_by = 'sales',
-				reason = $15
-			WHERE id = $16;
+				reason = $14
+			WHERE id = $15;
 			`
 
 		_, err = tx.Exec(context.Background(), query,
-			input.CustomerID,
+			input.Customer,
 			input.SubTotalRP,
 			input.Status,
 			input.Divisi,
 			input.InvoiceNumber,
-			input.PONumber,
 			input.DueDate,
 			input.DoctorName,
 			input.PatientName,
@@ -245,14 +245,14 @@ func PostingEdit_PI(c *gin.Context) {
 					insert into order_items (
 						pi_id, "name", quantity, price, discount, 
 						sub_total, kat, 
-						created_at, created_by, update_at, updated_by
+						created_at, created_by, update_at, updated_by, variable, kode, gudang
 						) 
-					VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'sales', NOW(), 'sales')
+					VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'sales', NOW(), 'sales'), $8, $9, $10
 				`
 
 				_, err = tx.Exec(ctx, QueryItem,
 					input.ID, detail.NamaBarang, detail.Quantity, detail.HargaSatuan,
-					detail.Discount, detail.RPSubTotalItem, detail.Kat)
+					detail.Discount, detail.RPSubTotalItem, detail.Variable, detail.Variable, detail.Kode, detail.Gudang)
 
 				if err != nil {
 					tx.Rollback(ctx)
@@ -272,7 +272,10 @@ func PostingEdit_PI(c *gin.Context) {
 					sub_total = $5,
 					kat = $6,
 					update_at = $7,
-					updated_by = $8
+					updated_by = $8,
+					variable = $10,
+					kode = $11,
+					gudang = $12
 				WHERE id = $9;
 				`
 
@@ -282,10 +285,13 @@ func PostingEdit_PI(c *gin.Context) {
 					detail.HargaSatuan,
 					detail.Discount,
 					detail.RPSubTotalItem,
-					detail.Kat,
+					detail.Variable,
 					time.Now(),
 					"sales",
 					detail.Id,
+					detail.Variable,
+					detail.Kode,
+					detail.Gudang,
 				)
 
 				if err != nil {

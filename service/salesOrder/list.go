@@ -22,31 +22,29 @@ func ListDaftar_PO(c *gin.Context) {
 
 	query := `
 		select 
-			COALESCE(a.id, 0) AS id,
-			COALESCE(a.customer_id, 0) AS customer_id,
-			COALESCE(a.status, '') AS status,
-			COALESCE(a.divisi, '') AS divisi,
-			COALESCE(a.invoice_number, '') AS invoice_number,
-			COALESCE(a.po_number, '') AS po_number,
-			COALESCE(a.due_date , '') AS due_date,
-			COALESCE(a.doctor_name, '') AS doctor_name,
-			COALESCE(a.patient_name, '') AS patient_name,
-			COALESCE(a.pajak, '') AS pajak,
-			COALESCE(a.total, '') AS total,
-			COALESCE(a.sub_total, '') AS sub_total,
-			COALESCE(a.tanggal_tindakan, '') AS tanggal_tindakan,
-			COALESCE(a.rm, '') AS rm,
-			COALESCE(a.number_si, '') AS number_si,
-			a.created_at ,
-			c.nama_perusahaan 
-		from performance_invoice a, customer c  where status = 'Diterima' and a.customer_id = c.id  order by id asc;
+				COALESCE(a.id, 0) AS id,
+				COALESCE(a.customer, '') AS customer,
+				COALESCE(a.status, '') AS status,
+				COALESCE(a.divisi, '') AS divisi,
+				COALESCE(a.invoice_number, '') AS invoice_number,
+				COALESCE(a.due_date , '') AS due_date,
+				COALESCE(a.doctor_name, '') AS doctor_name,
+				COALESCE(a.patient_name, '') AS patient_name,
+				COALESCE(a.pajak, '') AS pajak,
+				COALESCE(a.total, '') AS total,
+				COALESCE(a.sub_total, '') AS sub_total,
+				COALESCE(a.tanggal_tindakan, '') AS tanggal_tindakan,
+				COALESCE(a.rm, '') AS rm,
+				COALESCE(a.number_si, '') AS number_si,
+				a.created_at 
+			from performance_invoice a where status = 'Diterima'  order by id asc;
 	`
 
 	row, err := tx.Query(ctx, query)
 	if err != nil {
 		log.Println("Gagal Eksekusi Query !")
 		tx.Rollback(ctx)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query diterima", "status": false})
 		return
 
 	}
@@ -60,11 +58,10 @@ func ListDaftar_PO(c *gin.Context) {
 		var tanggalAsli time.Time
 		err := row.Scan(
 			&ambil.ID,
-			&ambil.CustomerID,
+			&ambil.Customer,
 			&ambil.Status,
 			&ambil.Divisi,
 			&ambil.InvoiceNumber,
-			&ambil.PONumber,
 			&ambil.DueDate,
 			&ambil.DoctorName,
 			&ambil.PatientName,
@@ -75,7 +72,6 @@ func ListDaftar_PO(c *gin.Context) {
 			&ambil.RM,
 			&ambil.NumberSI,
 			&tanggalAsli,
-			&ambil.Customer,
 		)
 
 		if err != nil {
@@ -108,7 +104,7 @@ func ListDaftar_PO(c *gin.Context) {
 			rows, err := tx.Query(ctx, queryOrder, data.ID)
 			if err != nil {
 				tx.Rollback(ctx)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query barang", "status": false})
 				return
 			}
 			defer rows.Close()
