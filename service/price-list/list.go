@@ -2,6 +2,7 @@ package price_list
 
 import (
 	"backend_project_fismed/model"
+	"backend_project_fismed/utility"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -106,17 +107,19 @@ func ListByCustomer(c *gin.Context) {
 	if cek == 0 {
 		log.Println("Customer Baru, Hargannya blm di set !")
 		queryList := `
-		SELECT 
-			a.variable,
-			a.nama,
-			a.kode
-		FROM stock a
-		GROUP BY 
-			a.variable,
-			a.nama,
-			a.kode
-		ORDER BY a.nama;
-	`
+			SELECT 
+				a.variable,
+				a.nama,
+				a.kode,
+				CAST(a.price AS VARCHAR) AS price
+			FROM stock a
+			GROUP BY 
+				a.variable,
+				a.nama,
+				a.kode,
+				a.price
+			ORDER BY a.nama;
+		`
 
 		row, err := tx.Query(ctx, queryList)
 		if err != nil {
@@ -136,6 +139,7 @@ func ListByCustomer(c *gin.Context) {
 				&ambil.Variable,
 				&ambil.Nama,
 				&ambil.Kode,
+				&ambil.Price,
 			)
 
 			if err != nil {
@@ -145,7 +149,6 @@ func ListByCustomer(c *gin.Context) {
 			}
 			ambil.Name = ambil.Nama
 			ambil.NamarumahSakit = input.Nama
-			ambil.Price = "0"
 			ambil.Diskon = 0
 			ambil.Added = "0"
 
@@ -272,7 +275,7 @@ func SetPrice(c *gin.Context) {
 			diskon = $5,
 			price = $6,
 			added = $7
-		WHERE nama = $8
+		WHERE nama_rumah_sakit = $8 AND nama = $9
 	`
 
 	log.Println("Set To DB Start")
@@ -283,7 +286,17 @@ func SetPrice(c *gin.Context) {
 
 			if set.Added == "0" {
 				log.Println("Tambah Ke Price List")
-				_, err := tx.Exec(ctx, queryInsert, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1")
+				var id int
+				err := tx.QueryRow(ctx, "SELECT MIN(id) FROM customer WHERE nama_perusahaan = $1;", set.NamarumahSakit).Scan(&id)
+				if err != nil {
+					tx.Rollback(ctx)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+					return
+				}
+
+				set.Kode = utility.GenerateKode(id, set.NamarumahSakit)
+
+				_, err = tx.Exec(ctx, queryInsert, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1")
 				if err != nil {
 					tx.Rollback(ctx)
 					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
@@ -291,7 +304,7 @@ func SetPrice(c *gin.Context) {
 				}
 			} else {
 				log.Println("Update Ke Price List")
-				_, err := tx.Exec(ctx, queryUpdate, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1", set.Nama)
+				_, err := tx.Exec(ctx, queryUpdate, set.NamarumahSakit, set.Kode, set.Variable, set.Nama, set.Diskon, set.Price, "1", set.NamarumahSakit, set.Nama)
 				if err != nil {
 					tx.Rollback(ctx)
 					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
