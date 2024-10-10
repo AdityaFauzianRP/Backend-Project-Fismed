@@ -191,6 +191,17 @@ func RupiahToNumber(rupiah string) string {
 	return rupiah
 }
 
+func GenerateKode(IDCustomer int, customerName string) string {
+	customerPrefix := strings.ToUpper(customerName[:3])
+
+	now := time.Now()
+	bulan := now.Format("01")
+	tahun := now.Format("2006")
+	// Hasilkan kode
+	kode := fmt.Sprintf("%02dPL/FGI-RS%s/%s/%s", IDCustomer, customerPrefix, bulan, tahun)
+	return kode
+}
+
 func PersenToNumber(persen string) string {
 	// Hilangkan "Rp." dan titik-titik
 	persen = strings.Replace(persen, "%", "", -1)

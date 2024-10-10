@@ -230,6 +230,17 @@ func Edit_Finance(c *gin.Context) {
 						}
 
 						if SCANCEK == 0 {
+
+							var id int
+							err = tx.QueryRow(ctx, "SELECT MIN(id) FROM customer WHERE nama_perusahaan = $1;", rs.Name).Scan(&id)
+							if err != nil {
+								tx.Rollback(ctx)
+								c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
+								return
+							}
+
+							data.Kode = utility.GenerateKode(id, rs.Name)
+
 							queryInsertBarangPerusahaan := `
 							INSERT INTO price_list (nama_rumah_sakit, kode, variable, nama, diskon, price, added)
 							VALUES ($1, $2, $3, $4, $5, $6, $7)
