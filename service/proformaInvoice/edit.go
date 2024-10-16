@@ -49,6 +49,7 @@ func EditPI(c *gin.Context) {
 
 	var Subtotal int = 0
 	response.ItemDetailPI = make([]model.ResItemDetail, len(input.ItemDetailPI))
+	response.ItemDeleted = make([]model.ItemDeleted, len(input.ItemDeleted))
 
 	if len(input.ItemDetailPI) > 0 {
 

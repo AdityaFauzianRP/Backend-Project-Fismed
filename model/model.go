@@ -128,31 +128,31 @@ type Customer struct {
 }
 
 type PerformanceInvoiceDetail struct {
-	ID              int    `json:"id"`
-	CustomerID      int    `json:"customer_id"`
-	Status          string `json:"status"`
-	Divisi          string `json:"divisi"`
-	InvoiceNumber   string `json:"invoice_number"`
-	PONumber        string `json:"po_number"`
-	DueDate         string `json:"due_date"`
-	DoctorName      string `json:"nama_dokter"`
-	PatientName     string `json:"nama_pasien"`
-	TanggalTindakan string `json:"tanggal_tindakan"`
-	RM              string `json:"rm"`
-	NumberSI        string `json:"number_si"`
-	SubTotal        string `json:"sub_total"`
-	SubTotalRP      string `json:"RP_sub_total"`
-	Pajak           string `json:"pajak"`
-	PajakPPNRP      string `json:"RP_pajak_ppn"`
-	Total           string `json:"total"`
-	TotalRP         string `json:"RP_total"`
-	Reason          string `json:"reason"`
-	Tanggal         string `json:"tanggal"`
-	Customer        string `json:"rumah_sakit"`
-	AlamaCustomer   string `json:"alamat"`
-	Catatan         string `json:"catatan"`
-
-	ItemDetailPI []ResItemDetail `json:"item_detail_pi"`
+	ID              int             `json:"id"`
+	CustomerID      int             `json:"customer_id"`
+	Status          string          `json:"status"`
+	Divisi          string          `json:"divisi"`
+	InvoiceNumber   string          `json:"invoice_number"`
+	PONumber        string          `json:"po_number"`
+	DueDate         string          `json:"due_date"`
+	DoctorName      string          `json:"nama_dokter"`
+	PatientName     string          `json:"nama_pasien"`
+	TanggalTindakan string          `json:"tanggal_tindakan"`
+	RM              string          `json:"rm"`
+	NumberSI        string          `json:"number_si"`
+	SubTotal        string          `json:"sub_total"`
+	SubTotalRP      string          `json:"RP_sub_total"`
+	Pajak           string          `json:"pajak"`
+	PajakPPNRP      string          `json:"RP_pajak_ppn"`
+	Total           string          `json:"total"`
+	TotalRP         string          `json:"RP_total"`
+	Reason          string          `json:"reason"`
+	Tanggal         string          `json:"tanggal"`
+	Customer        string          `json:"rumah_sakit"`
+	AlamaCustomer   string          `json:"alamat"`
+	Catatan         string          `json:"catatan"`
+	ItemDeleted     []ItemDeleted   `json:"item_deleted"`
+	ItemDetailPI    []ResItemDetail `json:"item_detail_pi"`
 }
 
 type ResItemDetail struct {

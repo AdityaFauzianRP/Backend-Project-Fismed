@@ -3,6 +3,7 @@ package route
 import (
 	"backend_project_fismed/service/authentikasi"
 	"backend_project_fismed/service/customerProfilling"
+	"backend_project_fismed/service/gudang"
 	"backend_project_fismed/service/pemasukan"
 	"backend_project_fismed/service/pengeluaran"
 	"backend_project_fismed/service/piutang"
@@ -27,6 +28,11 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/stok/listbygudang", logMiddleware(stok.ListByGudangId))
 	router.POST("/api/stok/list-customer", logMiddleware(stok.ListBarang))
 	router.POST("/api/stok/list-proses", logMiddleware(stok.ListBarangProses))
+
+	//  Gudang API
+	router.POST("/api/gudang/list", logMiddleware(gudang.GudangListData))
+	router.POST("/api/gudang/tambah", logMiddleware(gudang.TambahGudang))
+	router.POST("/api/gudang/delete", logMiddleware(gudang.HapusGudang))
 
 	//  PRICE Baru APIL
 	router.POST("/api/price/list", logMiddleware(price_list.PriceList))
