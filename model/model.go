@@ -140,6 +140,7 @@ type PerformanceInvoiceDetail struct {
 	TanggalTindakan string          `json:"tanggal_tindakan"`
 	RM              string          `json:"rm"`
 	NumberSI        string          `json:"number_si"`
+	Nomor_sj        string          `json:"nomor_surat_jalan"`
 	SubTotal        string          `json:"sub_total"`
 	SubTotalRP      string          `json:"RP_sub_total"`
 	Pajak           string          `json:"pajak"`
@@ -151,6 +152,10 @@ type PerformanceInvoiceDetail struct {
 	Customer        string          `json:"rumah_sakit"`
 	AlamaCustomer   string          `json:"alamat"`
 	Catatan         string          `json:"catatan"`
+	PreperadBy      string          `json:"preperad_by"`
+	PreperadJabatan string          `json:"preperad_jabatan"`
+	ApprovedBy      string          `json:"approved_by"`
+	ApproveJabatan  string          `json:"approve_jabatan"`
 	ItemDeleted     []ItemDeleted   `json:"item_deleted"`
 	ItemDetailPI    []ResItemDetail `json:"item_detail_pi"`
 }
