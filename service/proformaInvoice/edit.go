@@ -166,7 +166,8 @@ func PostingEdit_PI(c *gin.Context) {
 				number_si = $9,
 				update_at = now(),
 				updated_by = 'sales',
-				reason = $10
+				reason = $10,
+				rm = $12
 			WHERE id = $11;
 			`
 
@@ -182,6 +183,7 @@ func PostingEdit_PI(c *gin.Context) {
 			input.NumberSI,
 			"",
 			input.ID,
+			input.RM,
 		)
 
 		log.Println("Edit Radiologi")
