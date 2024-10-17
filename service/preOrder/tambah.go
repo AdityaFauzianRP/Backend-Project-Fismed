@@ -58,13 +58,14 @@ func Posting(c *gin.Context) {
 			updated_by, 
 			sub_total, 
 			pajak, 
-			total
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)RETURNING id`
+			total,
+		    nomor_si
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)RETURNING id`
 
 	// Menjalankan query insert
 	err = tx.QueryRow(context.Background(), query, input.NamaSuplier, input.NomorPO, input.Tanggal,
 		input.CatatanPO, input.PreparedBy, input.PreparedJabatan, input.ApprovedBy, input.ApprovedJabatan, "DIPROSES",
-		time.Now(), "ADMIN", time.Now(), "ADMIN", input.SubTotal, input.Pajak, input.Total).Scan(&id)
+		time.Now(), "ADMIN", time.Now(), "ADMIN", input.SubTotal, input.Pajak, input.Total, input.NomorSI).Scan(&id)
 	if err != nil {
 		tx.Rollback(ctx)
 		utility.ResponseError(c, constanta.ErrQuery1)
@@ -210,10 +211,23 @@ func InquiryPO(c *gin.Context) {
 
 	}
 
+	var err error
+
 	log.Println("Data Input :", input)
 	var subtotal, total, ppn int
 	input.Tanggal = utility.FormatTanggal2(time.Now())
-	input.Nomor_po = utility.GenerateNomorPO()
+
+	err, input.Nomor_po = utility.CountPIPO()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err, "status": false})
+		return
+	}
+
+	err, input.Nomor_si = utility.CountSJPO()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err, "status": false})
+		return
+	}
 
 	for i, data := range input.Item {
 

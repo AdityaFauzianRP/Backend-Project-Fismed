@@ -121,6 +121,190 @@ func UpdateTokenInDatabase(userID int, newToken string) error {
 	return nil
 }
 
+func CountPIRAD() (error, string) {
+	data := ""
+	jumlahNoPI := 0
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err, ""
+	}
+	defer tx.Rollback(ctx)
+
+	countNoPI := `
+		UPDATE nomor_penghitungan
+		SET jumlah_no_pi = jumlah_no_pi + 1
+		RETURNING jumlah_no_pi;
+	`
+
+	err = tx.QueryRow(ctx, countNoPI).Scan(&jumlahNoPI)
+
+	if err != nil {
+		log.Fatalf("QueryRow failed: %v\n", err)
+	}
+
+	data = GenerateINVNumberRAD(jumlahNoPI)
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Fatalf("Transaction commit failed: %v\n", err)
+	}
+
+	return nil, data
+}
+
+func CountPIOT() (error, string) {
+	data := ""
+	jumlahNoPI := 0
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err, ""
+	}
+	defer tx.Rollback(ctx)
+
+	countNoPI := `
+		UPDATE nomor_penghitungan
+		SET jumlah_no_pi = jumlah_no_pi + 1
+		RETURNING jumlah_no_pi;
+	`
+
+	err = tx.QueryRow(ctx, countNoPI).Scan(&jumlahNoPI)
+
+	if err != nil {
+		log.Fatalf("QueryRow failed: %v\n", err)
+	}
+
+	data = GenerateINVNumberOT(jumlahNoPI)
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Fatalf("Transaction commit failed: %v\n", err)
+	}
+
+	return nil, data
+}
+
+func CountPIPO() (error, string) {
+	data := ""
+	jumlahNoPI := 0
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err, ""
+	}
+	defer tx.Rollback(ctx)
+
+	countNoPI := `
+		UPDATE nomor_penghitungan
+		SET jumlah_no_pi = jumlah_no_pi + 1
+		RETURNING jumlah_no_pi;
+	`
+
+	err = tx.QueryRow(ctx, countNoPI).Scan(&jumlahNoPI)
+
+	if err != nil {
+		log.Fatalf("QueryRow failed: %v\n", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Fatalf("Transaction commit failed: %v\n", err)
+	}
+
+	data = GenerateINVNumberPO(jumlahNoPI)
+
+	return nil, data
+}
+
+func CountSJRAD() (error, string) {
+	data := ""
+	jumlahNoSJ := 0
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err, ""
+	}
+	defer tx.Rollback(ctx)
+
+	countSJ := `
+		UPDATE nomor_penghitungan
+		SET jumlah_no_sj = jumlah_no_sj + 1
+		RETURNING jumlah_no_sj;
+	`
+
+	err = tx.QueryRow(ctx, countSJ).Scan(&jumlahNoSJ)
+
+	if err != nil {
+		log.Fatalf("QueryRow failed: %v\n", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Fatalf("Transaction commit failed: %v\n", err)
+	}
+
+	data = GenerateSJNumberRAD(jumlahNoSJ)
+
+	return nil, data
+}
+
+func CountSJOT() (error, string) {
+	data := ""
+	jumlahNoSJ := 0
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err, ""
+	}
+	defer tx.Rollback(ctx)
+
+	countSJ := `
+		UPDATE nomor_penghitungan
+		SET jumlah_no_sj = jumlah_no_sj + 1
+		RETURNING jumlah_no_sj;
+	`
+
+	err = tx.QueryRow(ctx, countSJ).Scan(&jumlahNoSJ)
+
+	if err != nil {
+		log.Fatalf("QueryRow failed: %v\n", err)
+	}
+
+	data = GenerateSJNumberOT(jumlahNoSJ)
+
+	return nil, data
+}
+
+func CountSJPO() (error, string) {
+	data := ""
+	jumlahNoSJ := 0
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err, ""
+	}
+	defer tx.Rollback(ctx)
+
+	countSJ := `
+		UPDATE nomor_penghitungan
+		SET jumlah_no_sj = jumlah_no_sj + 1
+		RETURNING jumlah_no_sj;
+	`
+
+	err = tx.QueryRow(ctx, countSJ).Scan(&jumlahNoSJ)
+
+	if err != nil {
+		log.Fatalf("QueryRow failed: %v\n", err)
+	}
+
+	data = GenerateSJNumberPO(jumlahNoSJ)
+
+	return nil, data
+}
+
 func GenerateNomorInvoice() string {
 	rand.Seed(time.Now().UnixNano())
 	const charset = "XYZ0123456789"

@@ -4,6 +4,7 @@ type PurchaseOrder struct {
 	ID              int          `json:"id,omitempty"`
 	NamaSuplier     string       `json:"nama_suplier,omitempty"`
 	NomorPO         string       `json:"nomor_po,omitempty"`
+	NomorSI         string       `json:"nomor_si,omitempty"`
 	Tanggal         string       `json:"tanggal,omitempty"`
 	CatatanPO       string       `json:"catatan_po,omitempty"`
 	PreparedBy      string       `json:"prepared_by,omitempty"`
@@ -84,6 +85,7 @@ type PurchaseOrder2 struct {
 	Total           string        `json:"total"`
 	Tanggal         string        `json:"tanggal"`
 	Nomor_po        string        `json:"nomor_po"`
+	Nomor_si        string        `json:"nomor_si"`
 	Item            []Item        `json:"item"`
 	ItemDeleted     []ItemDeleted `json:"item_deleted"`
 	Reason          string        `json:"reason"`

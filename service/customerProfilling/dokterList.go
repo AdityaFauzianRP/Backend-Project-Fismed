@@ -13,7 +13,7 @@ import (
 func DokterListbyname(c *gin.Context) {
 
 	ctx := context.Background()
-	tx, err := proformaInvoice.DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		panic(err.Error())
 	}

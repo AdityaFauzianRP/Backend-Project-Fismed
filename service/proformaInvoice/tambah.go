@@ -35,15 +35,38 @@ func InquiryPI(c *gin.Context) {
 
 	input.TanggalPI = time.Now().Format("2006-01-02")
 
-	if input.NamaDokter != "" {
-		//	Ortopedic
-		input.NomorInvoice = utility.GenerateINVNumber(342, "OT")
-	} else if input.NamaDokter == "" {
-		//	Ortopedic
-		input.NomorInvoice = utility.GenerateINVNumber(342, "RG")
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
 	}
+	defer tx.Rollback(ctx)
 
-	input.NomorSI = "SI/" + utility.GenerateTigaNomor() + "/" + utility.GenerateNomorInvoice()
+	if input.NamaDokter != "" {
+		err, input.NomorInvoice = utility.CountPIOT()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err, "status": false})
+			return
+		}
+
+		err, input.NomorSI = utility.CountSJOT()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err, "status": false})
+			return
+		}
+	} else if input.NamaDokter == "" {
+		err, input.NomorInvoice = utility.CountPIRAD()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err, "status": false})
+			return
+		}
+
+		err, input.NomorSI = utility.CountSJRAD()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err, "status": false})
+			return
+		}
+	}
 
 	var subtotal, total, ppn int
 
