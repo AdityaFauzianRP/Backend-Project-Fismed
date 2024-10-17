@@ -1,6 +1,7 @@
 package proformaInvoice
 
 import (
+	"backend_project_fismed/constanta"
 	"backend_project_fismed/model"
 	"backend_project_fismed/utility"
 	"context"
@@ -405,6 +406,36 @@ func EditAdmin(c *gin.Context) {
 				}
 
 			}
+		}
+
+		log.Println("Proses Duplikasi")
+
+		QueryInsertDuplicate := `
+			INSERT INTO performance_invoice_copy
+			SELECT *
+			FROM performance_invoice
+			WHERE id = $1;
+		`
+
+		_, err = tx.Exec(context.Background(), QueryInsertDuplicate, input.ID)
+		if err != nil {
+			tx.Rollback(ctx)
+			utility.ResponseError(c, constanta.ErrQuery3)
+			return
+		}
+
+		QueryInsertDuplicateItemOrder := `
+			INSERT INTO order_items_copy
+			SELECT *
+			FROM order_items
+			WHERE pi_id = $1;
+		`
+
+		_, err = tx.Exec(context.Background(), QueryInsertDuplicateItemOrder, input.ID)
+		if err != nil {
+			tx.Rollback(ctx)
+			utility.ResponseError(c, constanta.ErrQuery3)
+			return
 		}
 
 		//  Berhasil Masuk Ke Keuangan Mereka

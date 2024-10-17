@@ -52,9 +52,11 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/proforma-invoice/rs-listc", logMiddleware(customerProfilling.RumahSakitListC))
 	// Pro forma Invoice API
 	router.POST("/api/proforma-invoice/get-all-list", logMiddleware(proformaInvoice.GetAllList))
+	router.POST("/api/proforma-invoice/get-all-list-so", logMiddleware(proformaInvoice.GetAllListSO))
 	router.POST("/api/proforma-invoice/inquiry", logMiddleware(proformaInvoice.InquiryPI))
 	router.POST("/api/proforma-invoice/posting", logMiddleware(proformaInvoice.PostingPI))
 	router.POST("/api/proforma-invoice/detailPI", logMiddleware(proformaInvoice.DetailPI))
+	router.POST("/api/proforma-invoice/detailPI-so", logMiddleware(proformaInvoice.DetailPISO))
 	router.POST("/api/proforma-invoice/editPI-inquiry", logMiddleware(proformaInvoice.EditPI))
 	router.POST("/api/proforma-invoice/editPI-posting", logMiddleware(proformaInvoice.PostingEdit_PI))
 	router.POST("/api/proforma-invoice/editPI-admin", logMiddleware(proformaInvoice.EditAdmin))
@@ -70,6 +72,8 @@ func Routes(router *gin.Engine) {
 	// Pre Order API
 	router.POST("/api/purchase-order/list", logMiddleware(preOrder.ListPO))
 	router.POST("/api/purchase-order/detail", logMiddleware(preOrder.Detail))
+	router.POST("/api/purchase-order/list-so", logMiddleware(preOrder.ListPOSO))
+	router.POST("/api/purchase-order/detail-so", logMiddleware(preOrder.DetailSO))
 	router.POST("/api/purchase-order/inquiry", logMiddleware(preOrder.InquiryPO))
 	router.POST("/api/purchase-order/posting", logMiddleware(preOrder.Posting))
 	router.POST("/api/purchase-order/edit/finance", logMiddleware(preOrder.Edit_Finance))
@@ -80,6 +84,8 @@ func Routes(router *gin.Engine) {
 
 	// Sales Order API
 	router.POST("/api/sales_order/list", logMiddleware(salesOrder.ListDaftar_PO))
+	router.POST("/api/sales_order/list/finance", logMiddleware(salesOrder.ListDaftar_POFinance))
+	router.POST("/api/sales_order/list/admin", logMiddleware(salesOrder.ListDaftar_POAdmin))
 
 	// Pemasukan API
 	router.POST("/api/pemasukan/list", logMiddleware(pemasukan.List))

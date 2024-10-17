@@ -275,6 +275,34 @@ func Edit_Finance(c *gin.Context) {
 			}
 		}
 
+		QueryInsertDuplicate := `
+			INSERT INTO purchase_order_copy
+			SELECT * 
+			FROM purchase_order
+			WHERE id = $1;
+		`
+
+		_, err = tx.Exec(context.Background(), QueryInsertDuplicate, input.ID)
+		if err != nil {
+			tx.Rollback(ctx)
+			utility.ResponseError(c, constanta.ErrQuery3)
+			return
+		}
+
+		QueryInsertDuplicateItemBuyer := `
+			INSERT INTO item_buyer_copy
+			SELECT * 
+			FROM item_buyer
+			WHERE po_id = $1;
+		`
+
+		_, err = tx.Exec(context.Background(), QueryInsertDuplicateItemBuyer, input.ID)
+		if err != nil {
+			tx.Rollback(ctx)
+			utility.ResponseError(c, constanta.ErrQuery3)
+			return
+		}
+
 		// Masukan Ke Table Pengeluaran sebagai catatan
 
 		QueryPengeluaran := `
