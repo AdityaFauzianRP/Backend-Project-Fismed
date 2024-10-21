@@ -1,9 +1,16 @@
 services:
-  fismed_be:
+  fismed_be_dev:
     image: fismed-be:latest
-    container_name: fismed-be-dev
     build:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 8080:8080
+      - "8080:8080"
+    deploy:
+      # mode: replicated
+      # replicas: 2
+      # endpoint_mode: vip
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
