@@ -20,6 +20,7 @@ FROM alpine:3.14
 
 # Install necessary packages
 RUN apk add --update tzdata \
+    && apk add curl \
     && cp /usr/share/zoneinfo/Asia/Jakarta /etc/localtime \
     && echo "Asia/Jakarta" > /etc/timezone \
     && apk del tzdata \
