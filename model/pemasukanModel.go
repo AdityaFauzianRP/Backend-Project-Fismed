@@ -1,9 +1,21 @@
 package model
 
 type Pemasukan struct {
-	Id      int    `json:"id,omitempty"`
-	Nama    string `json:"nama,omitempty"`
-	Nominal string `json:"nominal,omitempty"`
-	Amount  string `json:"amount,omitempty"`
-	Tanggal string `json:"tanggal,omitempty"`
+	Id      int    `json:"id"`
+	Nama    string `json:"nama"`
+	Nominal string `json:"nominal"`
+	Amount  string `json:"amount"`
+	Pajak   string `json:"pajak"`
+	Tanggal string `json:"tanggal"`
+	Status  string `json:"status"`
+}
+
+type Pengeluaran struct {
+	Id      int    `json:"id"`
+	Nama    string `json:"nama"`
+	Nominal string `json:"nominal"`
+	Amount  string `json:"amount"`
+	Pajak   string `json:"pajak"`
+	Tanggal string `json:"tanggal"`
+	Status  string `json:"status"`
 }

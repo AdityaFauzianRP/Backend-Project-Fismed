@@ -410,6 +410,41 @@ func EditAdmin(c *gin.Context) {
 
 		log.Println("Proses Duplikasi")
 
+		//  Berhasil Masuk Ke Keuangan Mereka
+
+		input.Tanggal = utility.FormatTanggal2(time.Now())
+
+		Querypemasukan := `
+				INSERT INTO pemasukan (
+					nama, 
+					sub_total,
+					pajak,
+					total,
+					tanggal,
+				    status
+				) VALUES ($1, $2, $3, $4, $5, 'PENDING')`
+
+		_, err = tx.Exec(context.Background(), Querypemasukan, input.Customer, input.SubTotal, input.Pajak, input.Total, input.Tanggal)
+		if err != nil {
+			tx.Rollback(ctx)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+			return
+		}
+
+		query := `
+			UPDATE performance_invoice
+			SET
+				status = $1,
+				update_at = now(),
+				updated_by = 'admin'
+			WHERE id = $2;
+			`
+
+		_, err = tx.Exec(context.Background(), query,
+			input.Status,
+			input.ID,
+		)
+
 		QueryInsertDuplicate := `
 			INSERT INTO performance_invoice_copy
 			SELECT *
@@ -437,22 +472,6 @@ func EditAdmin(c *gin.Context) {
 			utility.ResponseError(c, constanta.ErrQuery3)
 			return
 		}
-
-		//  Berhasil Masuk Ke Keuangan Mereka
-
-		query := `
-			UPDATE performance_invoice
-			SET
-				status = $1,
-				update_at = now(),
-				updated_by = 'admin'
-			WHERE id = $2;
-			`
-
-		_, err = tx.Exec(context.Background(), query,
-			input.Status,
-			input.ID,
-		)
 		if err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})

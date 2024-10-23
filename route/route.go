@@ -13,9 +13,8 @@ import (
 	"backend_project_fismed/service/salesOrder"
 	"backend_project_fismed/service/stockBarang"
 	"backend_project_fismed/service/stok"
-	"log"
-
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func Routes(router *gin.Engine) {
@@ -91,13 +90,17 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/pemasukan/list", logMiddleware(pemasukan.List))
 
 	// Piutang API
-	router.POST("/api/piutang/list", logMiddleware(piutang.List))
+	router.POST("/api/piutang/list", logMiddleware(piutang.ListPiutang))
+	router.POST("/api/piutang/lunas", logMiddleware(piutang.LunasPiutang))
 
 	// Hutang API
 	router.POST("/api/hutang/list", logMiddleware(piutang.List))
+	router.POST("/api/hutang/lunas", logMiddleware(piutang.Lunas))
 
 	// Pengeluaran API
 	router.POST("/api/pengeluaran/list", logMiddleware(pengeluaran.List))
+
+	router.GET("/api/check", logMiddleware(authentikasi.HealthCheckHandler))
 
 	log.Println("Routes setup completed")
 }

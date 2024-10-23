@@ -108,3 +108,24 @@ func TokenValidate(c *gin.Context) {
 		"status":  true,
 	})
 }
+
+func HealthCheckHandler(c *gin.Context) {
+	// Mengecek koneksi ke database
+	ctx := context.Background()
+	err := DBConnect.Ping(ctx) // Ini adalah ping untuk mengecek koneksi
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": "Database connection failed",
+		})
+		return
+	}
+
+	log.Println("DB Connected !")
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Database connection is healthy",
+	})
+}

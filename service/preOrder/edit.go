@@ -311,8 +311,9 @@ func Edit_Finance(c *gin.Context) {
 					sub_total,
 					pajak,
 					total,
-					tanggal  
-				) VALUES ($1, $2, $3, $4, $5)`
+					tanggal,
+				    status
+				) VALUES ($1, $2, $3, $4, $5, 'PENDING')`
 
 		_, err = tx.Exec(context.Background(), QueryPengeluaran, input.NamaSuplier, input.SubTotal, input.Pajak, input.Total, input.Tanggal)
 		if err != nil {
