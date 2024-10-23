@@ -8,7 +8,6 @@ import (
 	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func List(c *gin.Context) {
@@ -24,10 +23,11 @@ func List(c *gin.Context) {
 		select 
 			COALESCE(id, 0) AS id,
 			COALESCE(nama, '') AS nama,
-			COALESCE(nominal, '') AS nominal,
-			COALESCE(amount, '') AS amount,
+			COALESCE(sub_total , '') AS sub_total,
+			COALESCE(pajak, '') AS pajak,
+			COALESCE(total, '') AS total,
 			tanggal
-		from pengeluaran p order by id desc 
+		from pengeluaran p where status = 'DITERIMA' order by id desc 
 	`
 
 	rows, err := tx.Query(ctx, query)
@@ -39,26 +39,28 @@ func List(c *gin.Context) {
 	defer rows.Close()
 
 	var Responses []model.Pemasukan
-	var total int = 0
+	var total int
 	for rows.Next() {
 		var res model.Pemasukan
-		var tanggaAsli time.Time
 		if err := rows.Scan(
 			&res.Id,
 			&res.Nama,
 			&res.Nominal,
+			&res.Pajak,
 			&res.Amount,
-			&tanggaAsli,
+			&res.Tanggal,
 		); err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
-
-		res.Tanggal = utility.FormatTanggal1(tanggaAsli)
-
 		nominal, _ := strconv.Atoi(res.Nominal)
 		total = total + nominal
+
+		res.Nominal = "Rp. " + utility.FormatRupiah(res.Nominal)
+		res.Pajak = "Rp. " + utility.FormatRupiah(res.Pajak)
+		res.Amount = "Rp. " + utility.FormatRupiah(res.Amount)
+
 		Responses = append(Responses, res)
 	}
 
