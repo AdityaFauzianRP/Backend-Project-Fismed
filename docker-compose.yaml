@@ -15,8 +15,8 @@ services:
     networks:
       - fismed-network
     # healthcheck:  # Health check for service readiness
-    #   test: ["CMD", "curl", "-f", "fismed-be-dev-1:8080/api/pemasukan/list", "|", "grep", "status"]
-    #   interval: 30s
+    #   test: ["CMD-SHELL", "curl -sf http://fismed-be-dev-1:8080/api/check | grep 'message'"]
+    #   interval: 10s
     #   timeout: 10s
     #   retries: 5
 
@@ -36,8 +36,8 @@ services:
     networks:
       - fismed-network
     # healthcheck:  # Health check for service readiness
-    #   test: ["CMD", "curl", "-f", "fismed-be-dev-2:8080/api/pemasukan/list", "|", "grep", "status"]
-    #   interval: 30s
+    #   test: ["CMD-SHELL", "curl -sf http://fismed-be-dev-2:8080/api/check | grep 'message'"]
+    #   interval: 10s
     #   timeout: 10s
     #   retries: 5
 
