@@ -15,3 +15,11 @@ type Price struct {
 type Set struct {
 	Input []Price `json:"input"`
 }
+
+type Profile struct {
+	ID               int    `json:"id"`
+	NamaPerusahaan   string `json:"nama_perusahaan"`
+	NotelpPerusahaan string `json:"notelp_perusahaan"`
+	NamaDokter       string `json:"nama_dokter"`
+	NotelpDokter     string `json:"notelp_dokter"`
+}

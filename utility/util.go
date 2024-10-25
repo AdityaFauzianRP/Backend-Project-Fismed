@@ -1,7 +1,6 @@
 package utility
 
 import (
-	"backend_project_fismed/constanta"
 	"context"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -34,26 +33,7 @@ func TanggalSekarang() time.Time {
 	return now
 }
 
-func ToUpperCase(namaPerusahaan string, divisi string) string {
-	if divisi == constanta.CustomerRS {
-		log.Println("Rumah Sakit !")
-
-	} else if divisi == constanta.CustomerNonRS {
-
-		log.Println("Non Rumah Sakit")
-
-		namaPerusahaan = "PT. " + namaPerusahaan
-
-	} else if divisi == constanta.CustomerAsSupplier {
-
-		log.Println("Supplier ")
-
-		namaPerusahaan = "PT. " + namaPerusahaan
-
-	} else {
-		log.Println("Selain Rumah Sakit !")
-
-	}
+func ToUpperCase(namaPerusahaan string) string {
 	return strings.ToUpper(namaPerusahaan)
 }
 
