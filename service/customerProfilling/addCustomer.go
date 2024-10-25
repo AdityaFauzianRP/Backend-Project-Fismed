@@ -37,8 +37,8 @@ func Add(c *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	input.NamaDokter = utility.ToUpperCase(input.NamaDokter, "0")
-	input.NamaPerusahaan = utility.ToUpperCase(input.NamaPerusahaan, input.KategoriDivisi)
+	input.NamaDokter = utility.ToUpperCase(input.NamaDokter)
+	input.NamaPerusahaan = utility.ToUpperCase(input.NamaPerusahaan)
 
 	if input.KategoriDivisi == constanta.CustomerRS {
 
