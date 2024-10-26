@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -574,6 +575,106 @@ func ListDaftar_POAdmin(c *gin.Context) {
 		} else {
 			c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []model.StockBarang{}, "status": true})
 		}
+	}
+
+}
+
+func ListDaftar_POAdmin_edit(c *gin.Context) {
+
+	var input model.PerformanceInvoiceDetail
+	//var response model.PurchaseOrder
+
+	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
+
+		if err := c.Bind(&input); err != nil {
+			utility.ResponseError(c, "Input Data Tidak Berhasil !")
+		}
+
+	} else {
+
+		if err := c.BindJSON(&input); err != nil {
+			utility.ResponseError(c, "Input Data Tidak Berhasil !")
+		}
+
+	}
+
+	log.Println("Data Input :", input)
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+	defer tx.Rollback(ctx)
+
+	var totalBaru, subtotalBaru, ppnBaru int
+
+	if len(input.ItemDetailPI) != 0 {
+		for _, data := range input.ItemDetailPI {
+
+			log.Println("Nama Barang :", data.NamaBarang)
+			log.Println("Id Barang : ", data.Id)
+
+			total, err := utility.CalculateTotal(data.Quantity, data.HargaSatuan, data.Discount)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+				return
+			}
+
+			totalint, _ := strconv.Atoi(total)
+
+			subtotalBaru = subtotalBaru + totalint
+
+			log.Println("Sub Total Baru : ", total)
+
+			totalRp := "Rp. " + utility.FormatRupiah(total)
+
+			query := `UPDATE order_items_copy SET 
+                            name = $1, 
+                            quantity = $3, 
+                            price = $4, 
+                            discount = $5, 
+                            sub_total = $6 
+                        WHERE id = $2`
+
+			_, err = tx.Exec(context.Background(), query, data.NamaBarang, data.Id, data.Quantity, data.HargaSatuan, data.Discount, totalRp)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+				return
+			}
+		}
+	}
+
+	//subtotalBaru
+
+	ppnBaru = subtotalBaru * 11 / 100
+	totalBaru = ppnBaru + subtotalBaru
+
+	input.Total = strconv.Itoa(totalBaru)
+	input.Pajak = strconv.Itoa(ppnBaru)
+	input.SubTotal = strconv.Itoa(subtotalBaru)
+
+	log.Println("Total Baru :", input.Total)
+	log.Println("Sub Total Baru :", input.SubTotal)
+	log.Println("Pajak Baru :", input.Pajak)
+
+	query := `	
+		UPDATE performance_invoice_copy SET 
+    	    sub_total = $2, 
+    	    pajak = $3, 
+    	    total = $4
+    	WHERE id = $1
+	`
+
+	_, err = tx.Exec(context.Background(), query, input.ID, input.SubTotal, input.Pajak, input.Total)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	if err = tx.Commit(context.Background()); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction"})
+		return
 	}
 
 }
