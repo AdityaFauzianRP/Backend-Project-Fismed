@@ -39,6 +39,10 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/price/SetPrice", logMiddleware(price_list.SetPrice))
 
 	// Customer Profilling API
+	router.POST("/api/profile/ListByCustomer", logMiddleware(customerProfilling.ListProfile))
+	router.POST("/api/profile/DetailProfile", logMiddleware(customerProfilling.DetailProfile))
+	router.POST("/api/profile/EditDetailProfile", logMiddleware(customerProfilling.EditDetailProfile))
+
 	router.POST("/api/customer-profilling/add", logMiddleware(customerProfilling.Add))
 	router.POST("/api/customer-profilling/get-tax-code", logMiddleware(customerProfilling.GetTaxCode))
 	router.POST("/api/customer-profilling/get-by-search", logMiddleware(customerProfilling.GetBySearch))
@@ -85,6 +89,7 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/sales_order/list", logMiddleware(salesOrder.ListDaftar_PO))
 	router.POST("/api/sales_order/list/finance", logMiddleware(salesOrder.ListDaftar_POFinance))
 	router.POST("/api/sales_order/list/admin", logMiddleware(salesOrder.ListDaftar_POAdmin))
+	router.POST("/api/sales_order/list/admin/edit/nama-barang-pi-so", logMiddleware(salesOrder.ListDaftar_POAdmin_edit))
 
 	// Pemasukan API
 	router.POST("/api/pemasukan/list", logMiddleware(pemasukan.List))

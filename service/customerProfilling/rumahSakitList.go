@@ -1,6 +1,7 @@
 package customerProfilling
 
 import (
+	"backend_project_fismed/constanta"
 	"backend_project_fismed/model"
 	"backend_project_fismed/service/proformaInvoice"
 	"context"
@@ -23,7 +24,8 @@ func RumahSakitList(c *gin.Context) {
 		SELECT DISTINCT ON (nama_perusahaan) 
 			id, 
 			COALESCE(nama_perusahaan, 'default_name') AS name, 
-			COALESCE(address_perusahaan, 'default_address') AS address_company
+			COALESCE(address_perusahaan, 'default_address') AS address_company,
+			COALESCE(kategori_divisi, 'default_address') AS kategori_divisi
 		FROM customer
 		ORDER BY nama_perusahaan, id ASC;
 		`
@@ -43,11 +45,25 @@ func RumahSakitList(c *gin.Context) {
 			&res.ID,
 			&res.Name,
 			&res.AddressCompany,
+			&res.KategoriDivisi,
 		); err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
+
+		if res.KategoriDivisi == "1" {
+			res.KategoriDivisi = constanta.Customer
+		}
+
+		if res.KategoriDivisi == "2" {
+			res.KategoriDivisi = constanta.NonCustomer
+		}
+
+		if res.KategoriDivisi == "3" {
+			res.KategoriDivisi = constanta.Suplier
+		}
+
 		Responses = append(Responses, res)
 	}
 
