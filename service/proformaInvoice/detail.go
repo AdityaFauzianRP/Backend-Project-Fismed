@@ -93,6 +93,10 @@ func DetailPI(c *gin.Context) {
 			&invoice.AlamaCustomer,
 		)
 
+		invoice.Pajak = "Rp. " + utility.FormatRupiah(invoice.Pajak)
+		invoice.Total = "Rp. " + utility.FormatRupiah(invoice.Total)
+		invoice.SubTotal = "Rp. " + utility.FormatRupiah(invoice.SubTotal)
+
 		if err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to Scan query", "status": false})
@@ -249,6 +253,10 @@ func DetailPISO(c *gin.Context) {
 			&invoice.Reason,
 			&invoice.AlamaCustomer,
 		)
+
+		invoice.Pajak = "Rp. " + utility.FormatRupiah(invoice.Pajak)
+		invoice.Total = "Rp. " + utility.FormatRupiah(invoice.Total)
+		invoice.SubTotal = "Rp. " + utility.FormatRupiah(invoice.SubTotal)
 
 		if err != nil {
 			tx.Rollback(ctx)

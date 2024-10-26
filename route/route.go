@@ -89,6 +89,7 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/sales_order/list", logMiddleware(salesOrder.ListDaftar_PO))
 	router.POST("/api/sales_order/list/finance", logMiddleware(salesOrder.ListDaftar_POFinance))
 	router.POST("/api/sales_order/list/admin", logMiddleware(salesOrder.ListDaftar_POAdmin))
+	router.POST("/api/sales_order/list/admin/edit/nama-barang-pi-so", logMiddleware(salesOrder.ListDaftar_POAdmin_edit))
 
 	// Pemasukan API
 	router.POST("/api/pemasukan/list", logMiddleware(pemasukan.List))

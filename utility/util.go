@@ -21,6 +21,33 @@ func InitiateDB(db *pgxpool.Pool) {
 
 }
 
+func CalculateTotal(quantityStr, hargaSatuanStr, discountStr string) (string, error) {
+	// Konversi string ke angka
+	quantity, err := strconv.Atoi(quantityStr)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse quantity: %v", err)
+	}
+
+	hargaSatuan, err := strconv.ParseFloat(hargaSatuanStr, 64)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse harga_satuan: %v", err)
+	}
+
+	discount, err := strconv.ParseFloat(discountStr, 64)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse discount: %v", err)
+	}
+
+	// Hitung total
+	total := float64(quantity) * hargaSatuan * (1 - discount/100)
+
+	totalStr := strconv.FormatFloat(total, 'f', 2, 64)
+
+	totalStr = strings.TrimSuffix(totalStr, ".00")
+
+	return totalStr, nil
+}
+
 func TanggalSekarang() time.Time {
 	location, err := time.LoadLocation("Asia/Jakarta")
 	if err != nil {
