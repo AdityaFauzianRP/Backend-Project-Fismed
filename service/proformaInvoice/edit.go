@@ -414,6 +414,12 @@ func EditAdmin(c *gin.Context) {
 
 		input.Tanggal = utility.FormatTanggal2(time.Now())
 
+		subTotal := utility.RupiahToNumber(input.SubTotal)
+
+		pajakPPN := utility.RupiahToNumber(input.Pajak)
+
+		totalHarga := utility.RupiahToNumber(input.Total)
+
 		Querypemasukan := `
 				INSERT INTO pemasukan (
 					nama, 
@@ -424,7 +430,7 @@ func EditAdmin(c *gin.Context) {
 				    status
 				) VALUES ($1, $2, $3, $4, $5, 'PENDING')`
 
-		_, err = tx.Exec(context.Background(), Querypemasukan, input.Customer, input.SubTotal, input.Pajak, input.Total, input.Tanggal)
+		_, err = tx.Exec(context.Background(), Querypemasukan, input.Customer, subTotal, pajakPPN, totalHarga, input.Tanggal)
 		if err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})

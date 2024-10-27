@@ -190,8 +190,8 @@ func Lunas(c *gin.Context) {
 	`
 
 	_, err = tx.Exec(context.Background(), query,
-		input.Id,     // $1
-		input.Status, // $2
+		input.Id,   // $1
+		"DITERIMA", // $2
 	)
 	if err != nil {
 		log.Fatalf("Error executing insert: %v", err)
@@ -237,8 +237,8 @@ func LunasPiutang(c *gin.Context) {
 	`
 
 	_, err = tx.Exec(context.Background(), query,
-		input.Id,     // $1
-		input.Status, // $2
+		input.Id,   // $1
+		"DITERIMA", // $2
 	)
 	if err != nil {
 		log.Fatalf("Error executing insert: %v", err)
