@@ -55,8 +55,8 @@ func List(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
-		nominal, _ := strconv.Atoi(res.Nominal)
-		total = total + nominal
+		Amount, _ := strconv.Atoi(res.Amount)
+		total = total + Amount
 
 		res.Nominal = "Rp. " + utility.FormatRupiah(res.Nominal)
 		res.Pajak = "Rp. " + utility.FormatRupiah(res.Pajak)
@@ -129,8 +129,8 @@ func ListPiutang(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
-		nominal, _ := strconv.Atoi(res.Nominal)
-		total = total + nominal
+		Amount, _ := strconv.Atoi(res.Amount)
+		total = total + Amount
 
 		res.Nominal = "Rp. " + utility.FormatRupiah(res.Nominal)
 		res.Pajak = "Rp. " + utility.FormatRupiah(res.Pajak)
