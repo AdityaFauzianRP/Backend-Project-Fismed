@@ -12,6 +12,13 @@ type Stock struct {
 	Price      string `json:"price"`
 }
 
+type BarangTerjual struct {
+	NamaBarang string `json:"nama_barang"`
+	Qty        string `json:"quantity"`
+	Tanggal    string `json:"tanggal_terjual"`
+	Customer   string `json:"customer"`
+}
+
 type Gudang struct {
 	Id     int    `json:"id"`
 	Nama   string `json:"nama_gudang"`

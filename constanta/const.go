@@ -32,7 +32,7 @@ const (
 
 	Suplier     string = "Suplier"
 	Customer    string = "Customer"
-	NonCustomer string = "Non Customer"
+	NonCustomer string = "Customer Non RS"
 )
 
 var RomanMonths = map[string]string{
