@@ -99,7 +99,8 @@ func Detail(c *gin.Context) {
 			COALESCE(amount, '') AS amount,
 			COALESCE(kode, '') AS kode,
 			COALESCE(variable , '') AS variable,
-			COALESCE(gudang, '') AS gudang
+			COALESCE(gudang, '') AS gudang,
+			COALESCE(lots, '') AS lots
 		FROM item_buyer WHERE po_id = $1;
 	`
 	rows2, err := tx.Query(ctx, QeuryItem, res.ID)
@@ -124,6 +125,7 @@ func Detail(c *gin.Context) {
 			&get.Kode,
 			&get.Variable,
 			&get.Gudang,
+			&get.Lots,
 		); err != nil {
 			tx.Rollback(ctx)
 			utility.ResponseError(c, constanta.ErrScan2)
@@ -270,7 +272,8 @@ func DetailSO(c *gin.Context) {
 			COALESCE(amount, '') AS amount,
 			COALESCE(kode, '') AS kode,
 			COALESCE(variable , '') AS variable,
-			COALESCE(gudang, '') AS gudang
+			COALESCE(gudang, '') AS gudang,
+			COALESCE(lots, '') AS lots
 		FROM item_buyer_copy WHERE po_id = $1;
 	`
 	rows2, err := tx.Query(ctx, QeuryItem, res.ID)
@@ -295,6 +298,7 @@ func DetailSO(c *gin.Context) {
 			&get.Kode,
 			&get.Variable,
 			&get.Gudang,
+			&get.Lots,
 		); err != nil {
 			tx.Rollback(ctx)
 			utility.ResponseError(c, constanta.ErrScan2)

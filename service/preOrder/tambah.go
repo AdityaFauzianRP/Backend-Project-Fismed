@@ -84,10 +84,11 @@ func Posting(c *gin.Context) {
 					amount,
 					kode,
 					variable,
-				    gudang
-				) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+				    gudang,
+				    lots
+				) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 
-			_, err = tx.Exec(context.Background(), QueryItem, id, item.Name, item.Quantity, item.Price, item.Discount, item.Amount, item.Kode, item.Variable, item.Gudang)
+			_, err = tx.Exec(context.Background(), QueryItem, id, item.Name, item.Quantity, item.Price, item.Discount, item.Amount, item.Kode, item.Variable, item.Gudang, item.Lots)
 			if err != nil {
 				tx.Rollback(ctx)
 				utility.ResponseError(c, constanta.ErrQuery2)
@@ -234,19 +235,29 @@ func InquiryPO(c *gin.Context) {
 		harga1, err := strconv.Atoi(data.Price)
 		if err != nil {
 			log.Println("Harga Bukan String !")
+			c.JSON(http.StatusExpectationFailed, gin.H{"message": "Harga Bukan String!", "status": false})
 			return
 		}
 
 		pcs, err := strconv.Atoi(data.Quantity)
 		if err != nil {
 			log.Println("Quantity Bukan String !")
+			c.JSON(http.StatusExpectationFailed, gin.H{"message": "Quantity Bukan String!", "status": false})
 			return
 		}
 
-		input.Item[i].Amount = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1*pcs))
+		disc, err := strconv.Atoi(data.Diskon)
+		if err != nil {
+			log.Println("Diskon Bukan String !")
+			c.JSON(http.StatusExpectationFailed, gin.H{"message": "Diskon Bukan String!", "status": false})
+
+			return
+		}
+
+		input.Item[i].Amount = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1*pcs-(harga1*pcs*disc/100)))
 		input.Item[i].Price = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1))
 
-		subtotal = subtotal + harga1*pcs
+		subtotal = subtotal + harga1*pcs - (harga1 * pcs * disc / 100)
 	}
 
 	ppn = subtotal * 11 / 100

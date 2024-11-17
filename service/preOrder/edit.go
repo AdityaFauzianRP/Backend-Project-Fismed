@@ -47,10 +47,16 @@ func Edit_Admin(c *gin.Context) {
 			return
 		}
 
-		input.Item[i].Amount = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1*pcs))
+		disc, err := strconv.Atoi(data.Diskon)
+		if err != nil {
+			log.Println("Quantity Bukan String !")
+			return
+		}
+
+		input.Item[i].Amount = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1*pcs-(harga1*pcs*disc/100)))
 		input.Item[i].Price = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1))
 
-		subtotal = subtotal + harga1*pcs
+		subtotal = subtotal + harga1*pcs - (harga1 * pcs * disc / 100)
 	}
 
 	ppn = subtotal * 11 / 100
@@ -202,10 +208,10 @@ func Edit_Finance(c *gin.Context) {
 				log.Println("Tambah Data Baru Di Gudang !")
 
 				queryInsertBarang := `
-					INSERT INTO stock (variable, nama, qty, price, gudang_id, kode) 
-					VALUES ($1, $2, $3, $4, $5, $6)
+					INSERT INTO stock (variable, nama, qty, price, gudang_id, kode, lots) 
+					VALUES ($1, $2, $3, $4, $5, $6, &7)
 				`
-				_, err := tx.Exec(ctx, queryInsertBarang, data.Variable, data.Name, data.Quantity, data.Price, idGudang, data.Kode)
+				_, err := tx.Exec(ctx, queryInsertBarang, data.Variable, data.Name, data.Quantity, data.Price, idGudang, data.Kode, data.Lots)
 				if err != nil {
 					tx.Rollback(ctx)
 					log.Println("Error Detail : ", err)
@@ -262,10 +268,10 @@ func Edit_Finance(c *gin.Context) {
 
 				queryUpdateBarang := `
 					UPDATE stock 
-					SET variable = $1, nama = $2, qty = qty + $3, price = $4, kode = $5 
+					SET variable = $1, nama = $2, qty = qty + $3, price = $4, kode = $5, lots = $8
 					WHERE nama = $6 AND gudang_id = $7;
 				`
-				_, err := tx.Exec(ctx, queryUpdateBarang, data.Variable, data.Name, data.Quantity, data.Price, data.Kode, data.Name, idGudang)
+				_, err := tx.Exec(ctx, queryUpdateBarang, data.Variable, data.Name, data.Quantity, data.Price, data.Kode, data.Name, idGudang, data.Lots)
 				if err != nil {
 					tx.Rollback(ctx)
 					log.Println("Error Detail : ", err)
@@ -285,6 +291,7 @@ func Edit_Finance(c *gin.Context) {
 		_, err = tx.Exec(context.Background(), QueryInsertDuplicate, input.ID)
 		if err != nil {
 			tx.Rollback(ctx)
+			log.Println("Error Insert Data Duplicate : ", err)
 			utility.ResponseError(c, constanta.ErrQuery3)
 			return
 		}
@@ -299,6 +306,7 @@ func Edit_Finance(c *gin.Context) {
 		_, err = tx.Exec(context.Background(), QueryInsertDuplicateItemBuyer, input.ID)
 		if err != nil {
 			tx.Rollback(ctx)
+			log.Println("QueryInsertDuplicateItemBuyer : ", err)
 			utility.ResponseError(c, constanta.ErrQuery3)
 			return
 		}
@@ -318,6 +326,7 @@ func Edit_Finance(c *gin.Context) {
 		_, err = tx.Exec(context.Background(), QueryPengeluaran, input.NamaSuplier, input.SubTotal, input.Pajak, input.Total, input.Tanggal)
 		if err != nil {
 			tx.Rollback(ctx)
+			log.Println("QueryPengeluaran :", err)
 			utility.ResponseError(c, constanta.ErrQuery3)
 			return
 		}
@@ -412,10 +421,12 @@ func Posting_Edit_admin(c *gin.Context) {
 						amount,
 						kode,
 						variable,
-						gudang
-					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+						gudang,
+					    discount,
+					    lots
+					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 
-				_, err = tx.Exec(context.Background(), QueryItem, input.ID, item.Name, item.Quantity, item.Price, item.Amount, item.Kode, item.Variable, item.Gudang)
+				_, err = tx.Exec(context.Background(), QueryItem, input.ID, item.Name, item.Quantity, item.Price, item.Amount, item.Kode, item.Variable, item.Gudang, item.Diskon, item.Lots)
 				if err != nil {
 					tx.Rollback(ctx)
 					utility.ResponseError(c, "Error on Add New Item")
@@ -433,7 +444,9 @@ func Posting_Edit_admin(c *gin.Context) {
 						amount=$4,
 						kode=$5,
 						variable=$6,
-						gudang=$7
+						gudang=$7,
+						discount=$9,
+						lots=$10
 					WHERE id=$8
 				`
 
@@ -446,6 +459,8 @@ func Posting_Edit_admin(c *gin.Context) {
 					item.Variable,
 					item.Gudang,
 					item.ID,
+					item.Diskon,
+					item.Lots,
 				)
 
 				if err != nil {

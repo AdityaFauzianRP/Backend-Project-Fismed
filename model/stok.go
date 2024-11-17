@@ -8,6 +8,7 @@ type Stock struct {
 	Harga      string `json:"harga"`
 	Kode       string `json:"kode"`
 	NamaGudang string `json:"namaGudang,omitempty"`
+	Lots       string `json:"lots"`
 	Name       string `json:"name"`
 	Price      string `json:"price"`
 }
