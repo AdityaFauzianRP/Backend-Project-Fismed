@@ -42,7 +42,8 @@ func ListByGudangId(c *gin.Context) {
 			a.qty,
 			a.price,
 			a.kode, 
-			g.nama_gudang
+			g.nama_gudang,
+			a.lots
 		from stock a , gudang g where gudang_id = $1 and a.gudang_id  = g.id 
 	`
 
@@ -66,6 +67,7 @@ func ListByGudangId(c *gin.Context) {
 			&ambil.Harga,
 			&ambil.Kode,
 			&ambil.NamaGudang,
+			&ambil.Lots,
 		)
 
 		if err != nil {
@@ -104,7 +106,8 @@ func ListBarang(c *gin.Context) {
 			a.qty,
 			a.price,
 			a.kode,
-			g.nama_gudang
+			g.nama_gudang,
+			coalesce(a.lots, '') as lots
 		from stock a, gudang g where a.gudang_id = g.id
 	`
 
@@ -128,6 +131,7 @@ func ListBarang(c *gin.Context) {
 			&ambil.Harga,
 			&ambil.Kode,
 			&ambil.NamaGudang,
+			&ambil.Lots,
 		)
 
 		if err != nil {

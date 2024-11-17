@@ -42,6 +42,7 @@ type ItemBuyer struct {
 	Kode     string `json:"kode"`
 	Variable string `json:"variable"`
 	Gudang   string `json:"gudang"`
+	Lots     string `json:"lots"`
 }
 
 type ItemBuyer2 struct {
@@ -65,6 +66,9 @@ type Item struct {
 	Kode     string `json:"kode"`
 	Gudang   string `json:"gudang"`
 	Amount   string `json:"amount"`
+
+	Diskon string `json:"discount"`
+	Lots   string `json:"lots"`
 }
 
 type ItemDeleted struct {
