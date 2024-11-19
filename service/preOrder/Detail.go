@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -136,8 +137,6 @@ func Detail(c *gin.Context) {
 	}
 
 	var subtotaltampung int = 0
-	var totaltampung int = 0
-	var pajaktampung int = 0
 
 	if len(resItem) > 0 {
 		for i, item := range resItem {
@@ -155,24 +154,17 @@ func Detail(c *gin.Context) {
 		}
 	}
 
-	var subtotaltampungString string = ""
-	var totaltampungString string = ""
-	var pajaktampungString string = ""
+	log.Println(res.SubTotal)
+	log.Println(res.Total)
+	log.Println(res.Pajak)
 
-	pajaktampung = subtotaltampung * 11 / 100
-	totaltampung = pajaktampung + subtotaltampung
+	res.SubTotalRP = res.SubTotal
+	res.TotalRP = res.Total
+	res.PajakRP = res.Pajak
 
-	subtotaltampungString = strconv.Itoa(subtotaltampung)
-	totaltampungString = strconv.Itoa(totaltampung)
-	pajaktampungString = strconv.Itoa(pajaktampung)
-
-	res.SubTotalRP = "Rp. " + utility.FormatRupiah(subtotaltampungString)
-	res.TotalRP = "Rp. " + utility.FormatRupiah(totaltampungString)
-	res.PajakRP = "Rp. " + utility.FormatRupiah(pajaktampungString)
-
-	res.SubTotal = subtotaltampungString
-	res.Total = totaltampungString
-	res.Pajak = pajaktampungString
+	res.SubTotal = utility.RupiahToNumber(res.SubTotal)
+	res.Total = utility.RupiahToNumber(res.Total)
+	res.Pajak = utility.RupiahToNumber(res.Pajak)
 
 	res.Item = resItem
 

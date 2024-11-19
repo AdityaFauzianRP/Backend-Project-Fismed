@@ -26,7 +26,9 @@ func List(c *gin.Context) {
 			COALESCE(sub_total , '') AS sub_total,
 			COALESCE(pajak, '') AS pajak,
 			COALESCE(total, '') AS total,
-			tanggal
+			tanggal,
+			COALESCE(pi_id, '') AS pi_id,
+			COALESCE(status_pi, '') AS status_pi
 		from pemasukan p where status = 'DITERIMA' order by id desc 
 	`
 
@@ -49,6 +51,8 @@ func List(c *gin.Context) {
 			&res.Pajak,
 			&res.Amount,
 			&res.Tanggal,
+			&res.Piid,
+			&res.Divisi,
 		); err != nil {
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})

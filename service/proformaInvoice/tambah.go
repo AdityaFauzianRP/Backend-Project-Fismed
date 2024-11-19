@@ -31,6 +31,66 @@ func InquiryPI(c *gin.Context) {
 
 	}
 
+	if input.IDDivisi == "Radiologi" {
+		if input.RumahSakit == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+
+		if input.Alamat == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+
+		if input.RM == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+	}
+
+	if input.IDDivisi == "Ortopedi" {
+
+		if input.NamaDokter == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+
+		if input.NamaPasien == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+
+		if input.RM == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+
+		if input.TanggalTindakan == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+
+		if input.Alamat == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+
+		if input.RumahSakit == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+			return
+		}
+
+	}
+
+	if len(input.Item) != 0 {
+		for _, data := range input.Item {
+			if data.Quantity == "" {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Data belum lengkap", "status": false, "kode": 60})
+				return
+			}
+		}
+	}
+
 	log.Println("Data Input :", input)
 
 	input.TanggalPI = time.Now().Format("2006-01-02")
@@ -72,6 +132,7 @@ func InquiryPI(c *gin.Context) {
 
 	if len(input.Item) != 0 {
 		for i, data := range input.Item {
+
 			harga1, err := strconv.Atoi(data.HargaSatuan)
 			if err != nil {
 				log.Println("Harga Bukan String !")
@@ -88,7 +149,7 @@ func InquiryPI(c *gin.Context) {
 			input.Item[i].Price = "Rp. " + utility.FormatRupiah(strconv.Itoa(harga1))
 			input.Item[i].Price = input.Item[i].HargaSatuan
 
-			subtotal = subtotal + harga1*pcs
+			subtotal = subtotal + harga1*pcs - (harga1 * pcs * data.Discount / 100)
 		}
 	}
 
