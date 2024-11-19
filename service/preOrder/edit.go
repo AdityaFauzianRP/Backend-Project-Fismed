@@ -209,7 +209,7 @@ func Edit_Finance(c *gin.Context) {
 
 				queryInsertBarang := `
 					INSERT INTO stock (variable, nama, qty, price, gudang_id, kode, lots) 
-					VALUES ($1, $2, $3, $4, $5, $6, &7)
+					VALUES ($1, $2, $3, $4, $5, $6, $7)
 				`
 				_, err := tx.Exec(ctx, queryInsertBarang, data.Variable, data.Name, data.Quantity, data.Price, idGudang, data.Kode, data.Lots)
 				if err != nil {
@@ -320,10 +320,11 @@ func Edit_Finance(c *gin.Context) {
 					pajak,
 					total,
 					tanggal,
-				    status
-				) VALUES ($1, $2, $3, $4, $5, 'PENDING')`
+				    status,
+				    po_id
+				) VALUES ($1, $2, $3, $4, $5, 'PENDING', $6)`
 
-		_, err = tx.Exec(context.Background(), QueryPengeluaran, input.NamaSuplier, input.SubTotal, input.Pajak, input.Total, input.Tanggal)
+		_, err = tx.Exec(context.Background(), QueryPengeluaran, input.NamaSuplier, input.SubTotal, input.Pajak, input.Total, input.Tanggal, strconv.Itoa(input.ID))
 		if err != nil {
 			tx.Rollback(ctx)
 			log.Println("QueryPengeluaran :", err)

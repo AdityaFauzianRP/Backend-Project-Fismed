@@ -427,12 +427,15 @@ func EditAdmin(c *gin.Context) {
 					pajak,
 					total,
 					tanggal,
-				    status
-				) VALUES ($1, $2, $3, $4, $5, 'PENDING')`
+				    status,
+				    pi_id,
+				    status_pi
+				) VALUES ($1, $2, $3, $4, $5, 'PENDING', $6, $7)`
 
-		_, err = tx.Exec(context.Background(), Querypemasukan, input.Customer, subTotal, pajakPPN, totalHarga, input.Tanggal)
+		_, err = tx.Exec(context.Background(), Querypemasukan, input.Customer, subTotal, pajakPPN, totalHarga, input.Tanggal, strconv.Itoa(input.ID), input.Divisi)
 		if err != nil {
 			tx.Rollback(ctx)
+			log.Println("Error Query : ", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 			return
 		}
@@ -461,6 +464,7 @@ func EditAdmin(c *gin.Context) {
 		_, err = tx.Exec(context.Background(), QueryInsertDuplicate, input.ID)
 		if err != nil {
 			tx.Rollback(ctx)
+			log.Println("Error Query : ", err)
 			utility.ResponseError(c, constanta.ErrQuery3)
 			return
 		}
@@ -475,11 +479,13 @@ func EditAdmin(c *gin.Context) {
 		_, err = tx.Exec(context.Background(), QueryInsertDuplicateItemOrder, input.ID)
 		if err != nil {
 			tx.Rollback(ctx)
+			log.Println("Error Query : ", err)
 			utility.ResponseError(c, constanta.ErrQuery3)
 			return
 		}
 		if err != nil {
 			tx.Rollback(ctx)
+			log.Println("Error Query : ", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query", "status": false})
 			return
 		}

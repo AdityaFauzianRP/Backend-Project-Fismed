@@ -8,6 +8,8 @@ type Pemasukan struct {
 	Pajak   string `json:"pajak"`
 	Tanggal string `json:"tanggal"`
 	Status  string `json:"status"`
+	Piid    string `json:"pi_id"`
+	Divisi  string `json:"divisi"`
 }
 
 type Pengeluaran struct {
@@ -18,4 +20,6 @@ type Pengeluaran struct {
 	Pajak   string `json:"pajak"`
 	Tanggal string `json:"tanggal"`
 	Status  string `json:"status"`
+	Piid    string `json:"pi_id"`
+	Divisi  string `json:"divisi"`
 }

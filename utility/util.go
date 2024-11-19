@@ -373,12 +373,9 @@ func FormatRupiah(amountStr string) string {
 }
 
 func RupiahToNumber(rupiah string) string {
-	// Hilangkan "Rp." dan titik-titik
 	rupiah = strings.Replace(rupiah, "Rp. ", "", -1)
 	rupiah = strings.Replace(rupiah, ".", "", -1)
 
-	// Konversi string ke float64
-	fmt.Printf("Angka biasa: %.0f\n", rupiah)
 	return rupiah
 }
 
