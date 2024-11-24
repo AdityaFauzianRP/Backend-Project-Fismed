@@ -530,3 +530,73 @@ func EditAdmin(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Data Update Successfully", "status": true})
 }
+
+func CancelPI(c *gin.Context) {
+	var input model.PerformanceInvoiceDetail
+
+	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
+
+		if err := c.Bind(&input); err != nil {
+			return
+		}
+
+	} else {
+
+		if err := c.BindJSON(&input); err != nil {
+			return
+		}
+
+	}
+
+	log.Println("Input Data :", input.ID)
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+	defer tx.Rollback(ctx)
+
+	QueryCancel := `UPDATE performance_invoice SET status = 'DIBATALKAN' WHERE id = $1`
+
+	QueryHapusPemasukan := `DELETE FROM pemasukan WHERE pi_id = $1`
+
+	QueryHapusTableDuplikatPI := `UPDATE performance_invoice_copy SET status = 'DIBATALKAN' WHERE id = $1`
+
+	_, err = tx.Exec(ctx, QueryCancel, input.ID)
+	if err != nil {
+		tx.Rollback(ctx)
+		log.Println("Error Query : ", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	_, err = tx.Exec(ctx, QueryHapusPemasukan, strconv.Itoa(input.ID))
+	if err != nil {
+		tx.Rollback(ctx)
+		log.Println("Error Query : ", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	_, err = tx.Exec(ctx, QueryHapusTableDuplikatPI, input.ID)
+	if err != nil {
+		tx.Rollback(ctx)
+		log.Println("Error Query : ", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	if err != nil {
+		tx.Rollback(ctx)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data Update Successfully", "status": true})
+}

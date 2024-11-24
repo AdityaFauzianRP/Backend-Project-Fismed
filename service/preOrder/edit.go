@@ -493,3 +493,68 @@ func Posting_Edit_admin(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Data Update successfully", "status": true})
 }
+
+func CancelPO(c *gin.Context) {
+	var input model.PurchaseOrder
+	//var response model.PurchaseOrder
+
+	if c.GetHeader("content-type") == "application/x-www-form-urlencoded" || c.GetHeader("content-type") == "application/x-www-form-urlencoded; charset=utf-8" {
+
+		if err := c.Bind(&input); err != nil {
+			utility.ResponseError(c, "Input Data Tidak Berhasil !")
+		}
+
+	} else {
+
+		if err := c.BindJSON(&input); err != nil {
+			utility.ResponseError(c, "Input Data Tidak Berhasil !")
+		}
+
+	}
+
+	log.Println("Data Input :", input)
+
+	ctx := context.Background()
+	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+	defer tx.Rollback(ctx)
+
+	QeuryPembatalanPO := `UPDATE purchase_order SET status = 'DIBATALKAN' WHERE id = $1`
+	QueryHapuePengeluaran := `DELETE FROM pengeluaran WHERE po_id = $1`
+	QueryPembatanPODuplikat := `UPDATE purchase_order_copy SET status = 'DIBATALKAN' WHERE id = $1`
+
+	_, err = tx.Exec(ctx, QeuryPembatalanPO, input.ID)
+	if err != nil {
+		utility.ResponseError(c, "Error Query Pembatalan PO")
+		return
+	}
+
+	_, err = tx.Exec(ctx, QueryHapuePengeluaran, strconv.Itoa(input.ID))
+	if err != nil {
+		utility.ResponseError(c, "Error Query Hapus Pengeluaran")
+		return
+	}
+
+	_, err = tx.Exec(ctx, QueryPembatanPODuplikat, input.ID)
+	if err != nil {
+		utility.ResponseError(c, "Error Query Pembatalan PO Duplikat")
+		return
+	}
+
+	if err != nil {
+		tx.Rollback(ctx)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
+		return
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction", "status": false})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data Update Successfully", "status": true})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data Edit Success !", "status": true})
+}
