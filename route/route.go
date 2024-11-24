@@ -68,6 +68,8 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/proforma-invoice/editPI-admin", logMiddleware(proformaInvoice.EditAdmin))
 	router.POST("/api/proforma-invoice/divisi-list", logMiddleware(proformaInvoice.DivisiList))
 
+	router.POST("/api/proforma-invoice/cancel", logMiddleware(proformaInvoice.CancelPI))
+
 	// Stock Barang API
 	router.POST("/api/stock-barang/add", logMiddleware(stockBarang.Add))
 	router.POST("/api/stock-barang/detail", logMiddleware(stockBarang.Detail))
@@ -76,6 +78,7 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/stock-barang/delete", logMiddleware(stockBarang.Delete))
 
 	// Pre Order API
+	router.POST("/api/purchase-order/cancel", logMiddleware(preOrder.CancelPO))
 	router.POST("/api/purchase-order/list", logMiddleware(preOrder.ListPO))
 	router.POST("/api/purchase-order/detail", logMiddleware(preOrder.Detail))
 	router.POST("/api/purchase-order/list-so", logMiddleware(preOrder.ListPOSO))
