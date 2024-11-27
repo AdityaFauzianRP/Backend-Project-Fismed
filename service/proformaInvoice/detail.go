@@ -8,6 +8,8 @@ import (
 	"github.com/jackc/pgx/v4"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func DetailPI(c *gin.Context) {
@@ -375,7 +377,8 @@ func DetailPISO(c *gin.Context) {
 			COALESCE(a.rm, '') AS rm,
 			COALESCE(a.number_si, '') AS number_si,
 			COALESCE(a.reason, '') AS reason,
-			COALESCE(a.alamat_customer , '') AS alamat_customer
+			COALESCE(a.alamat_customer , '') AS alamat_customer,
+			TO_CHAR(update_at , 'DD-MM-YYYY') AS update_at_string
 		FROM 
 			performance_invoice_copy a where a.id = $1
 	`
@@ -413,6 +416,7 @@ func DetailPISO(c *gin.Context) {
 			&invoice.NumberSI,
 			&invoice.Reason,
 			&invoice.AlamaCustomer,
+			&invoice.Tanggal,
 		)
 
 		invoice.Pajak = "Rp. " + utility.FormatRupiah(invoice.Pajak)
@@ -481,9 +485,15 @@ func DetailPISO(c *gin.Context) {
 		invoice.ItemDetailPI = []model.ResItemDetail{}
 	}
 
-	if input.Export == "YES" {
-		utility.ExportPI(c, invoice)
+	totalstr := utility.RupiahToNumber(invoice.Total)
+	total, err := strconv.Atoi(totalstr)
+	if err != nil {
+		tx.Rollback(ctx)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to convert total to integer", "status": false})
+		return
 	}
+
+	invoice.Terbilang = terbilang(total)
 
 	if invoice.ID != 0 {
 		c.JSON(http.StatusOK, gin.H{"message": "Data Ditemukan !", "data": invoice, "status": true})
@@ -491,4 +501,63 @@ func DetailPISO(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Data Tidak Ditemukan !", "data": []model.StockBarang{}, "status": true})
 	}
 
+}
+
+var angkaKeKata = map[int]string{
+	0: "", 1: "Satu", 2: "Dua", 3: "Tiga", 4: "Empat",
+	5: "Lima", 6: "Enam", 7: "Tujuh", 8: "Delapan", 9: "Sembilan",
+}
+
+var grupAngka = []string{"", "Ribu", "Juta", "Miliar", "Triliun"}
+
+// Fungsi utama konversi angka ke teks
+func terbilang(angka int) string {
+	if angka == 0 {
+		return "Nol Rupiah"
+	}
+
+	hasil := ""
+	grup := 0
+
+	for angka > 0 {
+		ratusan := angka % 1000
+		if ratusan > 0 {
+			hasil = grupTeks(ratusan) + " " + grupAngka[grup] + " " + hasil
+		}
+		angka /= 1000
+		grup++
+	}
+
+	return strings.TrimSpace(hasil) + " Rupiah"
+}
+
+// Konversi ratusan ke teks
+func grupTeks(angka int) string {
+	ratus := angka / 100
+	puluhan := angka % 100
+	hasil := ""
+
+	if ratus > 0 {
+		if ratus == 1 {
+			hasil += "Seratus "
+		} else {
+			hasil += angkaKeKata[ratus] + " Ratus "
+		}
+	}
+
+	if puluhan > 0 {
+		if puluhan < 10 {
+			hasil += angkaKeKata[puluhan]
+		} else if puluhan < 20 {
+			if puluhan == 11 {
+				hasil += "Sebelas"
+			} else {
+				hasil += angkaKeKata[puluhan%10] + " Belas"
+			}
+		} else {
+			hasil += angkaKeKata[puluhan/10] + " Puluh " + angkaKeKata[puluhan%10]
+		}
+	}
+
+	return strings.TrimSpace(hasil)
 }
