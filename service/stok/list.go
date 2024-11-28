@@ -43,7 +43,7 @@ func ListByGudangId(c *gin.Context) {
 			a.price,
 			a.kode, 
 			g.nama_gudang,
-			a.lots
+			coalesce(a.lots, '') as lots
 		from stock a , gudang g where gudang_id = $1 and a.gudang_id  = g.id 
 	`
 
@@ -71,6 +71,8 @@ func ListByGudangId(c *gin.Context) {
 		)
 
 		if err != nil {
+
+			log.Println("Error : ", err)
 			tx.Rollback(ctx)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan Stock Barang  123", "status": false})
 			return
