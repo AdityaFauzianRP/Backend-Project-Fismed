@@ -110,6 +110,8 @@ func Routes(router *gin.Engine) {
 
 	// Pengeluaran API
 	router.POST("/api/pengeluaran/list", logMiddleware(pengeluaran.List))
+	router.POST("/api/pengeluaran/inquiry", logMiddleware(pengeluaran.Inquiry))
+	router.POST("/api/pengeluaran/posting", logMiddleware(pengeluaran.Posting))
 
 	router.GET("/api/check", logMiddleware(authentikasi.HealthCheckHandler))
 
