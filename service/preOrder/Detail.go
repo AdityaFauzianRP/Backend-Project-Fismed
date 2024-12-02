@@ -3,6 +3,7 @@ package preOrder
 import (
 	"backend_project_fismed/constanta"
 	"backend_project_fismed/model"
+	"backend_project_fismed/service/pengeluaran"
 	"backend_project_fismed/utility"
 	"context"
 	"github.com/gin-gonic/gin"
@@ -193,6 +194,27 @@ func DetailSO(c *gin.Context) {
 
 	}
 
+	if len(input.ID) >= 4 && input.ID[:4] == "PENG" {
+		log.Println("ini dari tambah pengeluaran")
+		responseData := pengeluaran.DetailPengeluaran(c, input.ID)
+
+		if responseData.ID != 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "Data Ditemukan !",
+				"data":    responseData,
+				"status":  true,
+			})
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "Data Tidak Ditemukan !",
+				"data":    []model.StockBarang{},
+				"status":  true,
+			})
+		}
+
+		return
+	}
+
 	ctx := context.Background()
 	tx, err := DBConnect.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -295,6 +317,10 @@ func DetailSO(c *gin.Context) {
 			tx.Rollback(ctx)
 			utility.ResponseError(c, constanta.ErrScan2)
 			return
+		}
+
+		if get.Discount == "" {
+			get.Discount = "0"
 		}
 
 		resItem = append(resItem, get)
