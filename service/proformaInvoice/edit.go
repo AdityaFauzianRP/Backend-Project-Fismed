@@ -33,6 +33,38 @@ func EditPI(c *gin.Context) {
 
 	}
 
+	if input.Customer == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+		return
+	}
+
+	if input.AlamaCustomer == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+		return
+	}
+
+	if input.Divisi == "Ortopedi" {
+		if input.TanggalTindakan == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+
+		if input.DoctorName == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+
+		if input.PatientName == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+	}
+
+	if input.RM == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+		return
+	}
+
 	// Proses Inquiry Edit
 
 	response.ID = input.ID

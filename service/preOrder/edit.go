@@ -31,6 +31,69 @@ func Edit_Admin(c *gin.Context) {
 	}
 
 	log.Println("Data Input :", input)
+
+	if input.NamaSuplier == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+		return
+	}
+
+	if input.PreparedJabatan == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+		return
+	}
+
+	if input.PreparedBy == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+		return
+	}
+
+	if input.ApprovedBy == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+		return
+	}
+
+	if input.ApprovedJabatan == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+		return
+	}
+
+	for _, item := range input.Item {
+		if item.Kode == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+
+		if item.Name == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+
+		if item.Quantity == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+
+		if item.Variable == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+
+		if item.Lots == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+
+		if item.Price == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+
+		if item.Gudang == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data Tidak Lengkap!", "status": false, "RC": 62})
+			return
+		}
+	}
+
 	var subtotal, total, ppn int
 
 	for i, data := range input.Item {
