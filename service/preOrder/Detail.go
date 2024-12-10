@@ -102,7 +102,8 @@ func Detail(c *gin.Context) {
 			COALESCE(kode, '') AS kode,
 			COALESCE(variable , '') AS variable,
 			COALESCE(gudang, '') AS gudang,
-			COALESCE(lots, '') AS lots
+			COALESCE(lots, '') AS lots,
+			COALESCE(keterangan_barang, '') AS keterangan_baran
 		FROM item_buyer WHERE po_id = $1;
 	`
 	rows2, err := tx.Query(ctx, QeuryItem, res.ID)
@@ -128,6 +129,7 @@ func Detail(c *gin.Context) {
 			&get.Variable,
 			&get.Gudang,
 			&get.Lots,
+			&get.KeteranganBarang,
 		); err != nil {
 			tx.Rollback(ctx)
 			utility.ResponseError(c, constanta.ErrScan2)

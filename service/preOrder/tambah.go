@@ -85,10 +85,11 @@ func Posting(c *gin.Context) {
 					kode,
 					variable,
 				    gudang,
-				    lots
-				) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
+				    lots,
+					keterangan_barang
+				) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
-			_, err = tx.Exec(context.Background(), QueryItem, id, item.Name, item.Quantity, item.Price, item.Discount, item.Amount, item.Kode, item.Variable, item.Gudang, item.Lots)
+			_, err = tx.Exec(context.Background(), QueryItem, id, item.Name, item.Quantity, item.Price, item.Discount, item.Amount, item.Kode, item.Variable, item.Gudang, item.Lots, item.KeteranganBarang)
 			if err != nil {
 				tx.Rollback(ctx)
 				utility.ResponseError(c, constanta.ErrQuery2)

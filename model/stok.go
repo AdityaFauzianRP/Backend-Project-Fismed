@@ -1,16 +1,17 @@
 package model
 
 type Stock struct {
-	Id         int    `json:"id"`
-	Variable   string `json:"variable"`
-	Nama       string `json:"nama"`
-	Qty        int    `json:"qty"`
-	Harga      string `json:"harga"`
-	Kode       string `json:"kode"`
-	NamaGudang string `json:"namaGudang,omitempty"`
-	Lots       string `json:"lots"`
-	Name       string `json:"name"`
-	Price      string `json:"price"`
+	Id               int    `json:"id"`
+	Variable         string `json:"variable"`
+	Nama             string `json:"nama"`
+	Qty              int    `json:"qty"`
+	Harga            string `json:"harga"`
+	Kode             string `json:"kode"`
+	NamaGudang       string `json:"namaGudang,omitempty"`
+	Lots             string `json:"lots"`
+	Name             string `json:"name"`
+	Price            string `json:"price"`
+	KeteranganBarang string `json:"keterangan_barang"`
 }
 
 type BarangTerjual struct {

@@ -31,18 +31,19 @@ type PurchaseOrder struct {
 
 // ItemBuyer represents the item_buyer table
 type ItemBuyer struct {
-	ID       int    `json:"id,omitempty"`
-	POID     int    `json:"po_id,omitempty"`
-	Name     string `json:"name,omitempty"`
-	Quantity string `json:"quantity,omitempty"`
-	Price    string `json:"price,omitempty"`
-	PriceRP  string `json:"price_rp,omitempty"`
-	Discount string `json:"discount,omitempty"`
-	Amount   string `json:"amount,omitempty"`
-	Kode     string `json:"kode"`
-	Variable string `json:"variable"`
-	Gudang   string `json:"gudang"`
-	Lots     string `json:"lots"`
+	ID               int    `json:"id,omitempty"`
+	POID             int    `json:"po_id,omitempty"`
+	Name             string `json:"name,omitempty"`
+	Quantity         string `json:"quantity,omitempty"`
+	Price            string `json:"price,omitempty"`
+	PriceRP          string `json:"price_rp,omitempty"`
+	Discount         string `json:"discount,omitempty"`
+	Amount           string `json:"amount,omitempty"`
+	Kode             string `json:"kode"`
+	Variable         string `json:"variable"`
+	Gudang           string `json:"gudang"`
+	Lots             string `json:"lots"`
+	KeteranganBarang string `json:"keterangan_barang"`
 }
 
 type ItemBuyer2 struct {
@@ -57,15 +58,16 @@ type ItemBuyer2 struct {
 }
 
 type Item struct {
-	ID       int64  `json:"id"`
-	PoID     int64  `json:"po_id"`
-	Name     string `json:"name"`
-	Quantity string `json:"quantity"`
-	Price    string `json:"price"`
-	Variable string `json:"variable"`
-	Kode     string `json:"kode"`
-	Gudang   string `json:"gudang"`
-	Amount   string `json:"amount"`
+	ID               int64  `json:"id"`
+	PoID             int64  `json:"po_id"`
+	Name             string `json:"name"`
+	Quantity         string `json:"quantity"`
+	Price            string `json:"price"`
+	Variable         string `json:"variable"`
+	Kode             string `json:"kode"`
+	Gudang           string `json:"gudang"`
+	Amount           string `json:"amount"`
+	KeteranganBarang string `json:"keterangan_barang"`
 
 	Diskon string `json:"discount"`
 	Lots   string `json:"lots"`
