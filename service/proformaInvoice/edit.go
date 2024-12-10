@@ -200,8 +200,9 @@ func PostingEdit_PI(c *gin.Context) {
 				update_at = now(),
 				updated_by = 'sales',
 				reason = $10,
-				rm = $12
-			WHERE id = $11;
+				rm = $11,
+				alamat_customer = $12
+			WHERE id = $13;
 			`
 
 		_, err = tx.Exec(context.Background(), query,
@@ -215,8 +216,9 @@ func PostingEdit_PI(c *gin.Context) {
 			input.TotalRP,
 			input.NumberSI,
 			"",
-			input.ID,
 			input.RM,
+			input.AlamaCustomer,
+			input.ID,
 		)
 
 		log.Println("Edit Radiologi")
@@ -240,8 +242,9 @@ func PostingEdit_PI(c *gin.Context) {
 				number_si = $13,
 				update_at = now(),
 				updated_by = 'sales',
-				reason = $14
-			WHERE id = $15;
+				reason = $14,
+				alamat_customer = $15
+			WHERE id = $16;
 			`
 
 		_, err = tx.Exec(context.Background(), query,
@@ -259,6 +262,7 @@ func PostingEdit_PI(c *gin.Context) {
 			input.RM,
 			input.NumberSI,
 			"",
+			input.AlamaCustomer,
 			input.ID,
 		)
 
@@ -267,6 +271,7 @@ func PostingEdit_PI(c *gin.Context) {
 	}
 
 	if err != nil {
+		fmt.Println("Error executing query:", err)
 		tx.Rollback(ctx)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err, "status": false})
 		return

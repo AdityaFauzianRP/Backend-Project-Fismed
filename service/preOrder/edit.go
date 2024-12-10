@@ -271,10 +271,10 @@ func Edit_Finance(c *gin.Context) {
 				log.Println("Tambah Data Baru Di Gudang !")
 
 				queryInsertBarang := `
-					INSERT INTO stock (variable, nama, qty, price, gudang_id, kode, lots) 
-					VALUES ($1, $2, $3, $4, $5, $6, $7)
+					INSERT INTO stock (variable, nama, qty, price, gudang_id, kode, lots, keterangan_barang) 
+					VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 				`
-				_, err := tx.Exec(ctx, queryInsertBarang, data.Variable, data.Name, data.Quantity, data.Price, idGudang, data.Kode, data.Lots)
+				_, err := tx.Exec(ctx, queryInsertBarang, data.Variable, data.Name, data.Quantity, data.Price, idGudang, data.Kode, data.Lots, data.KeteranganBarang)
 				if err != nil {
 					tx.Rollback(ctx)
 					log.Println("Error Detail : ", err)
@@ -331,10 +331,10 @@ func Edit_Finance(c *gin.Context) {
 
 				queryUpdateBarang := `
 					UPDATE stock 
-					SET variable = $1, nama = $2, qty = qty + $3, price = $4, kode = $5, lots = $8
+					SET variable = $1, nama = $2, qty = qty + $3, price = $4, kode = $5, lots = $8, keterangan_barang = $9
 					WHERE nama = $6 AND gudang_id = $7;
 				`
-				_, err := tx.Exec(ctx, queryUpdateBarang, data.Variable, data.Name, data.Quantity, data.Price, data.Kode, data.Name, idGudang, data.Lots)
+				_, err := tx.Exec(ctx, queryUpdateBarang, data.Variable, data.Name, data.Quantity, data.Price, data.Kode, data.Name, idGudang, data.Lots, data.KeteranganBarang)
 				if err != nil {
 					tx.Rollback(ctx)
 					log.Println("Error Detail : ", err)
@@ -487,10 +487,11 @@ func Posting_Edit_admin(c *gin.Context) {
 						variable,
 						gudang,
 					    discount,
-					    lots
-					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
+					    lots,
+					    keterangan_barang
+					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
-				_, err = tx.Exec(context.Background(), QueryItem, input.ID, item.Name, item.Quantity, item.Price, item.Amount, item.Kode, item.Variable, item.Gudang, item.Diskon, item.Lots)
+				_, err = tx.Exec(context.Background(), QueryItem, input.ID, item.Name, item.Quantity, item.Price, item.Amount, item.Kode, item.Variable, item.Gudang, item.Diskon, item.Lots, item.KeteranganBarang)
 				if err != nil {
 					tx.Rollback(ctx)
 					utility.ResponseError(c, "Error on Add New Item")
@@ -510,7 +511,8 @@ func Posting_Edit_admin(c *gin.Context) {
 						variable=$6,
 						gudang=$7,
 						discount=$9,
-						lots=$10
+						lots=$10,
+						keterangan_barang=$11
 					WHERE id=$8
 				`
 
@@ -525,6 +527,7 @@ func Posting_Edit_admin(c *gin.Context) {
 					item.ID,
 					item.Diskon,
 					item.Lots,
+					item.KeteranganBarang,
 				)
 
 				if err != nil {
