@@ -35,6 +35,11 @@ func Routes(router *gin.Engine) {
 	router.POST("/api/gudang/tambah", logMiddleware(gudang.TambahGudang))
 	router.POST("/api/gudang/delete", logMiddleware(gudang.HapusGudang))
 
+	//  Akun API
+	router.POST("/api/akun/list", logMiddleware(gudang.AkunListData))
+	router.POST("/api/akun/tambah", logMiddleware(gudang.TambahAkun))
+	router.POST("/api/akun/delete", logMiddleware(gudang.HapusAkun))
+
 	//  PRICE Baru APIL
 	router.POST("/api/price/list", logMiddleware(price_list.PriceList))
 	router.POST("/api/price/ListByCustomer", logMiddleware(price_list.ListByCustomer))

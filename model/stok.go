@@ -26,3 +26,10 @@ type Gudang struct {
 	Nama   string `json:"nama_gudang"`
 	Lokasi string `json:"alamat_gudang"`
 }
+
+type Akun struct {
+	Id       int    `json:"id"`
+	Nama     string `json:"username"`
+	Password string `json:"pw"`
+	RoleID   string `json:"role"`
+}
