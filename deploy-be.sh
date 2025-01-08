@@ -2,7 +2,7 @@
 
 set -e 
 
-docker build -t fismed-be:latest .
+docker build -t fismed-be-staging:latest .
 
 docker compose down -v
 

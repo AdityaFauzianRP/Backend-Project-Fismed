@@ -10,8 +10,8 @@ git checkout main
 
 sleep 1
 
-docker buildx build --platform linux/amd64 --progress=plain -t boyangyang/fismed-be:latest .
+docker buildx build --platform linux/amd64 --progress=plain -t boyangyang/fismed-be-staging:latest .
 
 sleep 1
 
-docker push boyangyang/fismed-be:latest
+docker push boyangyang/fismed-be-staging:latest

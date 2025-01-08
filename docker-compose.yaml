@@ -1,12 +1,12 @@
 services:
-  fismed-be-dev-1:
-    container_name: fismed-be-dev-1
-    image: fismed-be:latest
+  fismed-be-staging:
+    container_name: fismed-be-staging
+    image: fismed-be-staging:latest
     build:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "8081:8080"              # Expose 8081 on the host, 8080 in the container
+      - "8083:8080"              # Expose 8081 on the host, 8080 in the container
     deploy:
       resources:
         limits:
@@ -15,28 +15,28 @@ services:
     networks:
       - fismed-network
     # healthcheck:  # Health check for service readiness
-    #   test: ["CMD-SHELL", "curl -sf http://fismed-be-dev-1:8080/api/check | grep 'message'"]
+    #   test: ["CMD-SHELL", "curl -sf http://fismed-be-staging-dev-1:8080/api/check | grep 'message'"]
     #   interval: 10s
     #   timeout: 10s
     #   retries: 5
 
-  fismed-be-dev-2:
-    container_name: fismed-be-dev-2
-    image: fismed-be:latest
-    build:
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "8082:8080"              # Expose 8082 on the host, 8080 in the container
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-    networks:
-      - fismed-network
+  # fismed-be-staging-dev-2:
+  #   container_name: fismed-be-staging-dev-2
+  #   image: fismed-be-staging:latest
+  #   build:
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - "8082:8080"              # Expose 8082 on the host, 8080 in the container
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '0.50'
+  #         memory: 512M
+  #   networks:
+  #     - fismed-network
     # healthcheck:  # Health check for service readiness
-    #   test: ["CMD-SHELL", "curl -sf http://fismed-be-dev-2:8080/api/check | grep 'message'"]
+    #   test: ["CMD-SHELL", "curl -sf http://fismed-be-staging-dev-2:8080/api/check | grep 'message'"]
     #   interval: 10s
     #   timeout: 10s
     #   retries: 5
@@ -46,4 +46,4 @@ networks:
     driver: bridge  # Default bridge network
 
 # curl --location --request POST '209.182.237.155:8080/api/pemasukan/list'
-# curl --location --request POST 'fismed-be-dev-2:8080/api/proforma-invoice/get-all-list'
+# curl --location --request POST 'fismed-be-staging-dev-2:8080/api/proforma-invoice/get-all-list'
