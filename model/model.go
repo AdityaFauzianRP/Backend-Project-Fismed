@@ -160,6 +160,7 @@ type PerformanceInvoiceDetail struct {
 	ApprovedBy      string          `json:"approved_by"`
 	ApproveJabatan  string          `json:"approve_jabatan"`
 	Terbilang       string          `json:"terbilang"`
+	Keterangan      string          `json:"keterangan"`
 	ItemDeleted     []ItemDeleted   `json:"item_deleted"`
 	ItemDetailPI    []ResItemDetail `json:"item_detail_pi"`
 }

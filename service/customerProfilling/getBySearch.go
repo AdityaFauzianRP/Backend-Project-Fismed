@@ -407,7 +407,6 @@ func EditDetailProfile(c *gin.Context) {
 				term_of_payment = $28,
 				kategori_divisi = $29
 			WHERE id = $30
-
 			`
 
 	// Data yang akan diinsert

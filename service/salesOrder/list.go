@@ -662,11 +662,12 @@ func ListDaftar_POAdmin_edit(c *gin.Context) {
 		UPDATE performance_invoice_copy SET 
     	    sub_total = $2, 
     	    pajak = $3, 
-    	    total = $4
+    	    total = $4,
+    	    keterangan = $5
     	WHERE id = $1
 	`
 
-	_, err = tx.Exec(context.Background(), query, input.ID, input.SubTotal, input.Pajak, input.Total)
+	_, err = tx.Exec(context.Background(), query, input.ID, input.SubTotal, input.Pajak, input.Total, input.Keterangan)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return

@@ -55,7 +55,8 @@ func DetailPI(c *gin.Context) {
 			COALESCE(a.rm, '') AS rm,
 			COALESCE(a.number_si, '') AS number_si,
 			COALESCE(a.reason, '') AS reason,
-			COALESCE(a.alamat_customer , '') AS alamat_customer
+			COALESCE(a.alamat_customer , '') AS alamat_customer,
+			COALESCE(a.keterangan , '') AS keterangan
 		FROM 
 			performance_invoice a where a.id = $1
 	`
@@ -93,6 +94,7 @@ func DetailPI(c *gin.Context) {
 			&invoice.NumberSI,
 			&invoice.Reason,
 			&invoice.AlamaCustomer,
+			&invoice.Keterangan,
 		)
 
 		invoice.Pajak = "Rp. " + utility.FormatRupiah(invoice.Pajak)
@@ -378,7 +380,8 @@ func DetailPISO(c *gin.Context) {
 			COALESCE(a.number_si, '') AS number_si,
 			COALESCE(a.reason, '') AS reason,
 			COALESCE(a.alamat_customer , '') AS alamat_customer,
-			TO_CHAR(update_at , 'DD-MM-YYYY') AS update_at_string
+			TO_CHAR(update_at , 'DD-MM-YYYY') AS update_at_string,
+			COALESCE(a.keterangan , '') AS keterangan
 		FROM 
 			performance_invoice_copy a where a.id = $1
 	`
@@ -417,6 +420,7 @@ func DetailPISO(c *gin.Context) {
 			&invoice.Reason,
 			&invoice.AlamaCustomer,
 			&invoice.Tanggal,
+			&invoice.Keterangan,
 		)
 
 		invoice.Pajak = "Rp. " + utility.FormatRupiah(invoice.Pajak)

@@ -202,13 +202,13 @@ func PostingPI(c *gin.Context) {
 		INSERT INTO performance_invoice (
            customer, sub_total, status, divisi, invoice_number, doctor_name,
            patient_name, created_at, created_by, update_at, updated_by, total, pajak, tanggal_tindakan,
-           rm, number_si, alamat_customer
+           rm, number_si, alamat_customer, keterangan
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id;
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING id;
 	`
 	err = tx.QueryRow(ctx, queryInsertPI,
 		input.RumahSakit, input.Subtotal, "DIPROSES", input.IDDivisi, input.NomorInvoice, input.NamaDokter, input.NamaPasien,
-		time.Now(), "SALES", time.Now(), "SALES", input.Total, input.Pajak, input.TanggalTindakan, input.RM, input.NomorSI, input.Alamat).Scan(&newId)
+		time.Now(), "SALES", time.Now(), "SALES", input.Total, input.Pajak, input.TanggalTindakan, input.RM, input.NomorSI, input.Alamat, input.Keterangan).Scan(&newId)
 
 	if err != nil {
 		log.Println("Error Insert PI ! : ", err)

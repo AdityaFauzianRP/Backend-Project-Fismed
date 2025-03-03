@@ -38,4 +38,5 @@ type ProformaInvoice struct {
 	RP_total        string        `json:"RP_total"`
 	Item            []ItemPI      `json:"item"`
 	ItemDeleted     []DeletedItem `json:"item_deleted"`
+	Keterangan      string        `json:"keterangan"`
 }

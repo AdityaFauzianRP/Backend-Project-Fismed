@@ -142,6 +142,8 @@ func EditPI(c *gin.Context) {
 	response.AlamaCustomer = input.AlamaCustomer
 	response.Customer = input.Customer
 
+	response.Keterangan = input.Keterangan
+
 	now := time.Time{}
 	response.Tanggal = utility.FormatTanggal1(now)
 
@@ -201,7 +203,8 @@ func PostingEdit_PI(c *gin.Context) {
 				updated_by = 'sales',
 				reason = $10,
 				rm = $11,
-				alamat_customer = $12
+				alamat_customer = $12,
+				keterangan = $14
 			WHERE id = $13;
 			`
 
@@ -219,6 +222,7 @@ func PostingEdit_PI(c *gin.Context) {
 			input.RM,
 			input.AlamaCustomer,
 			input.ID,
+			input.Keterangan,
 		)
 
 		log.Println("Edit Radiologi")
@@ -243,7 +247,8 @@ func PostingEdit_PI(c *gin.Context) {
 				update_at = now(),
 				updated_by = 'sales',
 				reason = $14,
-				alamat_customer = $15
+				alamat_customer = $15,
+				keterangan = $17
 			WHERE id = $16;
 			`
 
@@ -264,6 +269,7 @@ func PostingEdit_PI(c *gin.Context) {
 			"",
 			input.AlamaCustomer,
 			input.ID,
+			input.Keterangan,
 		)
 
 		log.Println("Edit Ortopedi")
